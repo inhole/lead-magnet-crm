@@ -22,3 +22,4 @@
 - 검증: `npm run test:unit` 9건 통과, `npm run lint`, `npm run typecheck`, `npm run build`, `npm audit --audit-level=high` 통과
 - HTTP 확인: `/templates/new` 200, 정상 샘플 `/api/templates/validate` 200
 - 미실행: 실제 Supabase Storage 등록과 브라우저 시각 캡처 (Supabase 환경 미제공, 브라우저 자동화 런타임 초기화 실패)
+- CI 후속: Linux `npm ci`에서 누락된 선택 의존성을 명시적으로 고정한 뒤 깨끗한 설치와 전체 검증 통과
