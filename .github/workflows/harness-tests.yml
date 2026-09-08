@@ -1,0 +1,33 @@
+name: 하네스 도구 테스트
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  harness-tests:
+    name: 하네스 도구 검증 (앱 테스트 아님)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Summary 도구 테스트
+        run: python scripts/ci/run_harness_tests.py
+      - name: 한국어 테스트 Summary
+        if: always()
+        run: python scripts/ci/korean_summary.py reports/harness-counts.json --label "하네스 도구 테스트 (앱 테스트 아님)"
+      - name: 결과 보관
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: harness-test-results
+          path: reports/harness-counts.json
+          if-no-files-found: warn
+          retention-days: 7
