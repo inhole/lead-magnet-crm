@@ -39,3 +39,11 @@
 - 보안: 링크와 방문의 폼 소속을 DB 함수에서 재검증하고 공개 쓰기 RPC는 서버의 service role만 호출하도록 제한
 - 검증: 신청 입력 검증 단위 테스트 포함 `npm run test:unit` 17건, `npm run lint`, `npm run typecheck`, `npm run build`, `git diff --check` 통과
 - 미실행: 실제 Supabase 동시 요청·RLS 통합 테스트와 브라우저 E2E는 P07 환경에서 수행
+
+## P06 — CRM 신청자·성과 화면
+
+- 상태: 코드 및 로컬 검증 완료
+- 변경: 소유권 기반 신청 목록·상세와 성과 RPC/API, 전체·채널별 지표, shadcn Table·Dialog 기반 신청자 명단과 입력값 상세, 로딩·빈 상태·오류 상태
+- 지표: 방문, 고유 방문자, 신청, 신청한 고유 방문자 기준 전환율을 각각 집계해 JOIN 중복을 방지하고 직접 유입을 별도 표시
+- 검증: 지표 정의 단위 테스트 포함 `npm run test:unit` 20건, `npm run lint`, `npm run typecheck`, `npm run build`, `git diff --check` 통과
+- 미실행: 실제 Supabase RLS·집계 통합 테스트와 브라우저 E2E는 P07 환경에서 수행
