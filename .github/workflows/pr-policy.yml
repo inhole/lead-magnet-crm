@@ -1,0 +1,24 @@
+name: PR 운영 정책
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-policy-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  policy:
+    name: 브랜치·제목·이슈 연결
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: 정책 로직 단위 테스트
+        run: node --test .github/scripts/pr-policy.test.mjs
+      - name: 현재 PR 정책 검사
+        run: node .github/scripts/pr-policy.mjs "$GITHUB_EVENT_PATH"

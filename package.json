@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run",
-    "test:unit:ci": "vitest run --reporter=json --outputFile=reports/unit-results.json"
+    "test:unit:ci": "vitest run --reporter=json --outputFile=reports/unit-results.json",
+    "test:policy": "node --test .github/scripts/pr-policy.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
