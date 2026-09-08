@@ -3,9 +3,9 @@
 ## P01 — 앱·shadcn·CI 기반
 
 - 상태: 검증 완료
-- 변경: Next.js App Router, TypeScript, Tailwind v4, shadcn `components.json`, 관리자 캠페인 목록 화면, 품질 CI, ADR-001
-- 검증: `npm run lint`, `npm run typecheck`, `npm run build`
-- 결과: 세 명령 모두 통과
+- 변경: Next.js App Router, TypeScript, Tailwind v4, shadcn Base UI `base-nova` 초기화와 공식 컴포넌트, 관리자 캠페인 목록·로그인 화면 적용, 품질 CI, ADR-001
+- 검증: `shadcn info --json`, `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build`
+- 결과: CLI가 설치 컴포넌트를 인식하고 앱 검증 명령이 통과
 - 미완료: Supabase 인증·RLS·실제 캠페인 데이터는 P02에서 구현
 
 ## P02 — DB·로그인·소유권
