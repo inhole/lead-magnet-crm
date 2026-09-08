@@ -1,0 +1,10 @@
+.env*
+!.env.example
+node_modules/
+.next/
+.vercel/
+reports/
+test-results/
+playwright-report/
+__pycache__/
+*.pyc
