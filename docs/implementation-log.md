@@ -14,3 +14,11 @@
 - 변경: Supabase SSR 클라이언트, 로그인·로그아웃·현재 사용자 API, proxy 세션 갱신, 로그인 화면, .env.example, 초기 스키마·RLS 마이그레이션, ADR-002
 - 검증: npm run lint, npm run typecheck, npm run build 통과
 - 미실행: 실제 Supabase 프로젝트 연결·마이그레이션 적용·운영자 A/B 권한 통합 테스트 (환경변수와 DB 미제공)
+
+## P03 — HTML 등록·격리 미리보기
+
+- 상태: 코드 및 로컬 HTTP 검증 완료
+- 변경: parse5 허용 목록 검증, 입력 스키마 추출, 검증·등록 API, 비공개 Storage 정책, shadcn 업로드 화면, CSP sandbox 미리보기, 정상 샘플과 작성 규칙, 단위 테스트 CI
+- 검증: `npm run test:unit` 9건 통과, `npm run lint`, `npm run typecheck`, `npm run build`, `npm audit --audit-level=high` 통과
+- HTTP 확인: `/templates/new` 200, 정상 샘플 `/api/templates/validate` 200
+- 미실행: 실제 Supabase Storage 등록과 브라우저 시각 캡처 (Supabase 환경 미제공, 브라우저 자동화 런타임 초기화 실패)
