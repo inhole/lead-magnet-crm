@@ -5,7 +5,7 @@ import { renderSummary, validatePullRequest } from "./pr-policy.mjs"
 const valid = {
   base: { ref: "main" },
   head: { ref: "feat/12-public-form" },
-  title: "feat: `공개 신청 폼 추가`",
+  title: "feat: 공개 신청 폼 추가",
   body: "Closes #12",
 }
 
@@ -21,8 +21,14 @@ test("잘못된 작업 브랜치명을 거부한다", () => {
   assert.match(validatePullRequest({ ...valid, head: { ref: "feature/public-form" } }).join("\n"), /작업 브랜치/)
 })
 
-test("한글과 백틱이 없는 PR 제목을 거부한다", () => {
+test("한글이 없는 PR 제목을 거부한다", () => {
   assert.match(validatePullRequest({ ...valid, title: "feat: add form" }).join("\n"), /PR 제목/)
+})
+
+test("따옴표나 백틱으로 감싼 PR 제목을 거부한다", () => {
+  for (const title of ["feat: '공개 신청 폼 추가'", "feat: `공개 신청 폼 추가`", 'feat: "공개 신청 폼 추가"']) {
+    assert.match(validatePullRequest({ ...valid, title }).join("\n"), /PR 제목/)
+  }
 })
 
 test("종료 이슈 참조 누락을 거부한다", () => {

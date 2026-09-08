@@ -11,7 +11,7 @@
 - README는 실행·테스트 방법만 담고 설계는 ADR에 둔다.
 - 도구 자체 테스트 통과와 앱 기능 검증 완료를 구분한다.
 - 스킬 설치는 이슈 게시·PR 댓글·푸시·배포의 포괄적 승인을 의미하지 않는다. 사용자 요청 범위 안에서 수행한다.
-- Git 커밋 메시지는 Conventional Commits의 영문 type과 백틱으로 감싼 한글 제목을 사용한다. 형식은 type: `한글 제목`이며 type은 feat, fix, docs, test, refactor, chore, ci 중 변경 성격에 맞게 고른다.
+- Git 커밋 메시지는 Conventional Commits의 영문 type과 한글 제목을 사용한다. 형식은 `type: 한글 제목`이며 작은따옴표·큰따옴표·백틱으로 제목을 감싸지 않는다. type은 feat, fix, docs, test, refactor, chore, ci 중 변경 성격에 맞게 고른다.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
