@@ -47,3 +47,12 @@
 - 지표: 방문, 고유 방문자, 신청, 신청한 고유 방문자 기준 전환율을 각각 집계해 JOIN 중복을 방지하고 직접 유입을 별도 표시
 - 검증: 지표 정의 단위 테스트 포함 `npm run test:unit` 20건, `npm run lint`, `npm run typecheck`, `npm run build`, `git diff --check` 통과
 - 미실행: 실제 Supabase RLS·집계 통합 테스트와 브라우저 E2E는 P07 환경에서 수행
+
+## P07 — 앱 CI·전체 실패 흐름 검증
+
+- 상태: 로컬 실제 DB·브라우저 검증 완료, CI 원격 실행 대기
+- 변경: Supabase CLI 로컬 구성, 운영자 A/B·캠페인 fixture, RLS·멱등·성과 통합 테스트, 데스크톱·모바일 Chromium 핵심 흐름과 iframe 격리 E2E, reporter 어댑터와 필수 suite CI
+- 실행 검증: 새 로컬 Supabase에 전체 마이그레이션 적용, `npm run test:integration` 3건, `npm run test:e2e` 4건 통과
+- 발견·수정: PostgreSQL 반환 컬럼 예약어 충돌과 공개 폼의 인증 proxy 오분류를 실제 실행에서 확인해 수정
+- CI 판정: 결과 JSON 누락·0건·전체 건너뜀·실패를 한국어 Summary 단계에서 실패 처리하고 결과 artifact를 7일 보관
+- 미완료: 현재 커밋의 GitHub Actions 실행 결과는 PR 생성 후 확인

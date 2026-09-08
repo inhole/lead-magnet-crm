@@ -10,6 +10,10 @@
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run",
     "test:unit:ci": "vitest run --reporter=json --outputFile=reports/unit-results.json",
+    "test:integration": "vitest run --config vitest.integration.config.mts",
+    "test:integration:ci": "vitest run --config vitest.integration.config.mts --reporter=json --outputFile=reports/integration-results.json",
+    "test:e2e": "playwright test",
+    "test:e2e:ci": "playwright test",
     "test:policy": "node --test .github/scripts/pr-policy.test.mjs"
   },
   "dependencies": {
@@ -27,6 +31,7 @@
   "devDependencies": {
     "@emnapi/core": "^1.11.3",
     "@emnapi/runtime": "^1.11.3",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -36,6 +41,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
     "shadcn": "4.21.0",
+    "supabase": "^2.117.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.0"

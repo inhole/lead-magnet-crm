@@ -1,5 +1,5 @@
 create or replace function public.get_campaign_submissions(p_campaign_id uuid, p_limit integer default 100)
-returns table (submission_id uuid, submitted_at timestamptz, channel text, values jsonb)
+returns table (submission_id uuid, submitted_at timestamptz, channel text, form_values jsonb)
 language plpgsql security invoker set search_path = public as $$
 begin
   if not exists (select 1 from public.campaigns where id = p_campaign_id and owner_id = auth.uid()) then
@@ -17,7 +17,7 @@ begin
 end; $$;
 
 create or replace function public.get_campaign_submission(p_campaign_id uuid, p_submission_id uuid)
-returns table (submission_id uuid, submitted_at timestamptz, channel text, values jsonb)
+returns table (submission_id uuid, submitted_at timestamptz, channel text, form_values jsonb)
 language plpgsql security invoker set search_path = public as $$
 begin
   if not exists (select 1 from public.campaigns where id = p_campaign_id and owner_id = auth.uid()) then
