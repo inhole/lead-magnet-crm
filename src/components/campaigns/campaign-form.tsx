@@ -1,0 +1,61 @@
+"use client"
+
+import { FormEvent, useEffect, useMemo, useState } from "react"
+import { useRouter } from "next/navigation"
+
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty"
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Spinner } from "@/components/ui/spinner"
+import { Textarea } from "@/components/ui/textarea"
+
+type Template = { id: string; name: string; input_schema: Array<{ name: string; label: string; type: string; required: boolean }> }
+type FieldErrors = Partial<Record<"name" | "templateId" | "title" | "description" | "submitLabel", string>>
+
+export function CampaignForm() {
+  const router = useRouter()
+  const [templates, setTemplates] = useState<Template[]>([])
+  const [templateId, setTemplateId] = useState("")
+  const [values, setValues] = useState({ name: "", title: "", description: "", submitLabel: "신청하기" })
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [message, setMessage] = useState("")
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+
+  useEffect(() => {
+    fetch("/api/templates").then(async (response) => { const body = await response.json(); if (!response.ok) throw new Error(body.message); setTemplates(body.templates ?? []) }).catch((error) => setMessage(error instanceof Error ? error.message : "템플릿 목록을 불러오지 못했습니다.")).finally(() => setLoading(false))
+  }, [])
+
+  const selectedTemplate = useMemo(() => templates.find((template) => template.id === templateId), [templateId, templates])
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setSubmitting(true); setMessage(""); setFieldErrors({})
+    try {
+      const response = await fetch("/api/campaigns", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...values, templateId }) })
+      const body = await response.json()
+      if (!response.ok) { setFieldErrors(body.fieldErrors ?? {}); throw new Error(body.message) }
+      router.push(`/campaigns/${body.campaign.campaign_id}`)
+    } catch (error) { setMessage(error instanceof Error ? error.message : "캠페인을 저장하지 못했습니다.") } finally { setSubmitting(false) }
+  }
+
+  if (loading) return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Spinner /> 템플릿을 불러오는 중입니다.</div>
+  if (!templates.length && !message) return <Empty className="border"><EmptyHeader><EmptyTitle>등록된 템플릿이 없습니다</EmptyTitle><EmptyDescription>캠페인을 만들기 전에 HTML 템플릿을 등록하세요.</EmptyDescription></EmptyHeader><EmptyContent><Button onClick={() => router.push("/templates/new")}>템플릿 등록하기</Button></EmptyContent></Empty>
+
+  return <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)]">
+    <Card><CardHeader><CardTitle>캠페인 설정</CardTitle><CardDescription>템플릿을 선택하고 공개 폼에 표시할 문구를 입력하세요.</CardDescription></CardHeader><CardContent>
+      <form id="campaign-form" onSubmit={submit}><FieldGroup>
+        <Field data-invalid={Boolean(fieldErrors.name)}><FieldLabel htmlFor="name">캠페인 이름</FieldLabel><Input id="name" value={values.name} maxLength={120} aria-invalid={Boolean(fieldErrors.name)} onChange={(event) => setValues({ ...values, name: event.target.value })} /><FieldError>{fieldErrors.name}</FieldError></Field>
+        <Field data-invalid={Boolean(fieldErrors.templateId)}><FieldLabel>HTML 템플릿</FieldLabel><Select value={templateId} onValueChange={(value) => setTemplateId(value ?? "")}><SelectTrigger className="w-full" aria-invalid={Boolean(fieldErrors.templateId)}><SelectValue placeholder="템플릿 선택" /></SelectTrigger><SelectContent><SelectGroup>{templates.map((template) => <SelectItem key={template.id} value={template.id}>{template.name}</SelectItem>)}</SelectGroup></SelectContent></Select><FieldError>{fieldErrors.templateId}</FieldError></Field>
+        <Field data-invalid={Boolean(fieldErrors.title)}><FieldLabel htmlFor="title">공개 폼 제목</FieldLabel><Input id="title" value={values.title} maxLength={160} aria-invalid={Boolean(fieldErrors.title)} onChange={(event) => setValues({ ...values, title: event.target.value })} /><FieldError>{fieldErrors.title}</FieldError></Field>
+        <Field data-invalid={Boolean(fieldErrors.description)}><FieldLabel htmlFor="description">안내 문구</FieldLabel><Textarea id="description" value={values.description} maxLength={1000} aria-invalid={Boolean(fieldErrors.description)} onChange={(event) => setValues({ ...values, description: event.target.value })} /><FieldDescription>HTML은 삽입되지 않고 텍스트로만 표시됩니다.</FieldDescription><FieldError>{fieldErrors.description}</FieldError></Field>
+        <Field data-invalid={Boolean(fieldErrors.submitLabel)}><FieldLabel htmlFor="submitLabel">제출 버튼 문구</FieldLabel><Input id="submitLabel" value={values.submitLabel} maxLength={40} aria-invalid={Boolean(fieldErrors.submitLabel)} onChange={(event) => setValues({ ...values, submitLabel: event.target.value })} /><FieldError>{fieldErrors.submitLabel}</FieldError></Field>
+      </FieldGroup></form>
+      {message ? <Alert variant="destructive" className="mt-5"><AlertTitle>저장할 수 없습니다</AlertTitle><AlertDescription>{message}</AlertDescription></Alert> : null}
+    </CardContent><CardFooter><Button type="submit" form="campaign-form" disabled={submitting}>{submitting ? <Spinner data-icon="inline-start" /> : null}{submitting ? "저장 중" : "캠페인 만들기"}</Button></CardFooter></Card>
+    <Card><CardHeader><CardTitle>공개 폼 미리보기</CardTitle><CardDescription>{selectedTemplate ? `${selectedTemplate.name} · 입력 ${selectedTemplate.input_schema.length}개` : "템플릿을 선택하면 구성을 확인할 수 있습니다."}</CardDescription></CardHeader><CardContent className="flex flex-col gap-5"><div><p className="text-2xl font-bold tracking-tight">{values.title || "공개 폼 제목"}</p><p className="mt-2 text-sm text-muted-foreground">{values.description || "방문자에게 보여줄 안내 문구가 여기에 표시됩니다."}</p></div><div className="flex flex-col gap-3">{selectedTemplate?.input_schema.map((field) => <div key={field.name} className="rounded-lg border bg-muted/40 px-3 py-2 text-sm"><span className="font-medium">{field.label}</span><span className="ml-2 text-muted-foreground">{field.type}{field.required ? " · 필수" : ""}</span></div>)}</div><Button disabled>{values.submitLabel || "신청하기"}</Button></CardContent></Card>
+  </div>
+}
