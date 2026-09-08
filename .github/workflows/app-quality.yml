@@ -21,3 +21,39 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build
+
+  unit:
+    name: 단위 테스트
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - id: unit-tests
+        name: Vitest 실행
+        continue-on-error: true
+        run: npm run test:unit:ci
+      - name: 테스트 건수 변환
+        if: always()
+        run: node scripts/ci/vitest_counts.mjs reports/unit-results.json reports/unit-counts.json
+      - name: 한국어 테스트 Summary
+        if: always()
+        run: python scripts/ci/korean_summary.py reports/unit-counts.json --label "단위 테스트"
+      - name: 결과 보관
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: reports/unit-*.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: 테스트 실패 반영
+        if: steps.unit-tests.outcome != 'success'
+        run: exit 1

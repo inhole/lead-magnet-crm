@@ -12,6 +12,7 @@ npm run dev
 ## 검사
 
 ```bash
+npm run test:unit
 npm run lint
 npm run typecheck
 npm run build
