@@ -31,3 +31,11 @@
 - 보안: RLS를 통과한 운영자 생성 함수와 제한된 공개 폼 조회 함수로 운영자 정보를 제외
 - 검증: 캠페인 입력 단위 테스트 포함 npm run test:unit 13건, npm run lint, npm run typecheck, npm run build 통과
 - 미실행: 실제 Supabase 마이그레이션·운영자 간 소유권 통합 테스트는 P07 환경에서 수행
+
+## P05 — 채널 링크·방문·신청
+
+- 상태: 코드 및 로컬 검증 완료
+- 변경: 4개 채널 배포 링크, 방문·방문자·신청 스키마와 공개 RPC, 링크·방문·신청 API, 동적 공개 입력 폼, 멱등 제출과 완료·오류 상태, ADR-004
+- 보안: 링크와 방문의 폼 소속을 DB 함수에서 재검증하고 공개 쓰기 RPC는 서버의 service role만 호출하도록 제한
+- 검증: 신청 입력 검증 단위 테스트 포함 `npm run test:unit` 17건, `npm run lint`, `npm run typecheck`, `npm run build`, `git diff --check` 통과
+- 미실행: 실제 Supabase 동시 요청·RLS 통합 테스트와 브라우저 E2E는 P07 환경에서 수행
