@@ -23,7 +23,7 @@ export default function Home() {
         <aside className="border-t border-border pt-6 lg:border-l lg:border-t-0 lg:pl-8">
           <Card>
             <CardHeader>
-              <CardTitle>첫 캠페인을 시작하세요</CardTitle>
+              <CardTitle>캠페인을 시작하세요</CardTitle>
               <CardDescription>HTML 템플릿을 등록하고 나만의 신청 폼을 만들어 보세요.</CardDescription>
             </CardHeader>
             <CardContent>
