@@ -68,7 +68,15 @@
 
 ## P09 — 최종 배포·새 환경 재현
 
-- 상태: 공개 배포 경계 검증 완료, 원격 DB 쓰기 흐름 검증 진행 중
+- 상태: 원격 migration 및 공개 배포 경계 검증 완료, 운영자 쓰기 흐름 검증 진행 중
 - 변경: 비인증 보호·로그인·Supabase 설정·OpenAPI·API 문서·공개 폼 DB 경계를 확인하는 비파괴 배포 스모크 명령, Supabase migration dry-run부터 Vercel 배포·운영자 A/B 전체 흐름까지의 재현 런북
 - 배포 확인: Production `https://lead-magnet-crm.vercel.app`에서 루트 로그인 리다이렉트, 로그인 화면, 비인증 세션, OpenAPI 원본, API 문서, 존재하지 않는 공개 폼의 DB 오류 계약 확인
-- 미완료: 로컬 Supabase CLI가 원격 프로젝트에 인증·link되지 않아 원격 migration 목록과 새 DB 적용은 미확인. 운영자 계정이 필요한 전체 성공 흐름은 검증 전용 데이터 생성 승인을 받은 뒤 실행
+- 원격 DB 확인: 연결된 Supabase에서 `202609080001`~`202609080005`의 로컬·원격 migration 이력이 일치하고 `db push --linked --dry-run`이 up to date로 통과
+- 미완료: 운영자 계정이 필요한 Production 전체 성공 흐름과 A/B 소유권 차단은 검증 전용 데이터로 확인 필요
+
+## P10 — 제출 검수와 접근 안내
+
+- 상태: 제출 자료 초안 작성, 최종 수동 흐름 및 제출 커밋 확정 대기
+- 변경: 저장소·데모·API 문서 주소, Supabase·Vercel·CI 근거, 평가자 계정 전달 원칙, 지원·미지원 범위, 최종 수동 체크리스트와 제출 메일 초안 정리
+- 보안: 운영자 비밀번호·Supabase 키·신청자 원문은 문서화하지 않고 평가자 계정은 비공개 채널로 별도 전달
+- 남은 확인: P10 병합 SHA의 CI·Production 배포, 저장소 공개 상태 의도 확인, 연결된 Production에서 운영자 A/B 전체 흐름 실행
