@@ -9,20 +9,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
+import { HTML_TEMPLATE_AI_PROMPT } from "@/lib/forms/ai-prompt"
 import type { FormFieldSchema, HtmlValidationError } from "@/lib/forms/types"
 
 type Validation = { preview: string; fields: FormFieldSchema[] }
-const AI_PROMPT = `리드 수집용 단일 HTML 신청 폼을 만들어줘. 결과는 설명이나 마크다운 없이 완전한 HTML만 출력해줘.
-
-규칙:
-- form 요소는 정확히 1개만 사용하고 action 속성은 넣지 않는다.
-- 제목에는 data-form-title, 설명에는 data-form-description, 제출 버튼에는 data-form-submit 속성을 넣는다.
-- 모든 input, textarea, select에는 고유한 name과 연결된 label을 둔다.
-- 지원 입력 타입은 text, email, tel, number, date, checkbox, radio이며 필요한 항목은 required로 표시한다.
-- script, iframe, 외부 URL, 외부 CSS/폰트, 이벤트 핸들러(onclick 등)는 사용하지 않는다.
-- 개인정보는 최소한으로 요청하고 모바일에서도 읽기 쉽게 작성한다.
-
-폼 주제: [여기에 리드마그넷과 수집할 정보 입력]`
 
 export function HtmlUpload() {
   const [name, setName] = useState("")
@@ -79,11 +69,11 @@ export function HtmlUpload() {
           <div className="min-w-0">
             <div className="mb-2 flex items-center justify-between gap-3">
               <p className="text-sm font-medium">AI 생성 요청 예시</p>
-              <Button type="button" variant="outline" size="sm" onClick={async () => { await navigator.clipboard.writeText(AI_PROMPT); setPromptCopied(true) }}>
+              <Button type="button" variant="outline" size="sm" onClick={async () => { await navigator.clipboard.writeText(HTML_TEMPLATE_AI_PROMPT); setPromptCopied(true) }}>
                 {promptCopied ? <CheckIcon data-icon="inline-start" /> : <CopyIcon data-icon="inline-start" />}{promptCopied ? "복사됨" : "프롬프트 복사"}
               </Button>
             </div>
-            <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-muted p-4 text-xs leading-relaxed">{AI_PROMPT}</pre>
+            <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-muted p-4 text-xs leading-relaxed">{HTML_TEMPLATE_AI_PROMPT}</pre>
           </div>
         </CardContent>
       </Card>
