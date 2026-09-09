@@ -50,9 +50,9 @@
 
 ## P07 — 앱 CI·전체 실패 흐름 검증
 
-- 상태: 로컬 실제 DB·브라우저 검증 완료, CI 원격 실행 대기
+- 상태: 로컬 및 PR 실제 DB·브라우저 검증 완료
 - 변경: Supabase CLI 로컬 구성, 운영자 A/B·캠페인 fixture, RLS·멱등·성과 통합 테스트, 데스크톱·모바일 Chromium 핵심 흐름과 iframe 격리 E2E, reporter 어댑터와 필수 suite CI
 - 실행 검증: 새 로컬 Supabase에 전체 마이그레이션 적용, `npm run test:integration` 3건, `npm run test:e2e` 4건 통과
 - 발견·수정: PostgreSQL 반환 컬럼 예약어 충돌과 공개 폼의 인증 proxy 오분류를 실제 실행에서 확인해 수정
 - CI 판정: 결과 JSON 누락·0건·전체 건너뜀·실패를 한국어 Summary 단계에서 실패 처리하고 결과 artifact를 7일 보관
-- 미완료: 현재 커밋의 GitHub Actions 실행 결과는 PR 생성 후 확인
+- 원격 검증: PR #13에서 PR 정책, lint·typecheck·build, 단위 테스트, 실제 DB 통합 테스트, Chromium E2E, 결과 집계 도구 통과
