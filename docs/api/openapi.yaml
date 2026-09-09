@@ -136,11 +136,12 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [html, preview, fields]
+                required: [html, preview, fields, defaults]
                 properties:
                   html: { type: string }
                   preview: { type: string }
                   fields: { type: array, items: { $ref: '#/components/schemas/FormField' } }
+                  defaults: { type: object, required: [title, description, submitLabel], properties: { title: { type: string }, description: { type: string }, submitLabel: { type: string } } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '413': { $ref: '#/components/responses/HtmlTooLarge' }
   /api/templates/{id}/preview:
@@ -360,12 +361,15 @@ components:
         options: { type: array, items: { type: object, required: [value, label], properties: { value: { type: string }, label: { type: string } } } }
     Template:
       type: object
-      required: [id, name, input_schema, created_at]
+      required: [id, name, input_schema, created_at, default_title, default_description, default_submit_label]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
         input_schema: { type: array, items: { $ref: '#/components/schemas/FormField' } }
         created_at: { type: string, format: date-time }
+        default_title: { type: string }
+        default_description: { type: string }
+        default_submit_label: { type: string }
     CampaignInput:
       type: object
       required: [name, templateId, title, description, submitLabel]

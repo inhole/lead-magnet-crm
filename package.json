@@ -15,6 +15,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ci": "playwright test",
     "test:deployment:smoke": "node scripts/deployment/smoke.mjs",
+    "backfill:template-copy": "node scripts/backfill-template-copy-defaults.mjs",
     "test:policy": "node --test .github/scripts/pr-policy.test.mjs"
   },
   "dependencies": {

@@ -10,9 +10,10 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/c
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { HTML_TEMPLATE_AI_PROMPT } from "@/lib/forms/ai-prompt"
+import type { FormCopy } from "@/lib/forms/render-template"
 import type { FormFieldSchema, HtmlValidationError } from "@/lib/forms/types"
 
-type Validation = { preview: string; fields: FormFieldSchema[] }
+type Validation = { preview: string; fields: FormFieldSchema[]; defaults: FormCopy }
 
 export function HtmlUpload() {
   const [name, setName] = useState("")
@@ -32,7 +33,7 @@ export function HtmlUpload() {
     body.set("file", selectedFile)
     const response = await fetch("/api/templates/validate", { method: "POST", body })
     const data = await response.json()
-    if (response.ok) setValidation({ preview: data.preview, fields: data.fields })
+    if (response.ok) setValidation({ preview: data.preview, fields: data.fields, defaults: data.defaults })
     else setErrors(data.errors ?? [{ code: data.code ?? "UNKNOWN", message: data.message ?? "HTML 검증에 실패했습니다." }])
     setPending(null)
   }
@@ -97,7 +98,14 @@ export function HtmlUpload() {
           </FieldGroup>
 
           {pending === "validate" && <Alert className="mt-5"><Spinner /><AlertTitle>HTML을 검사하고 있습니다</AlertTitle><AlertDescription>구조, 입력 스키마, 실행 가능한 콘텐츠를 확인합니다.</AlertDescription></Alert>}
-          {validation && <Alert className="mt-5"><CheckCircle2Icon /><AlertTitle>검증을 통과했습니다</AlertTitle><AlertDescription>입력 항목 {validation.fields.length}개를 추출했습니다.</AlertDescription></Alert>}
+          {validation && <Alert className="mt-5"><CheckCircle2Icon /><AlertTitle>검증을 통과했습니다</AlertTitle><AlertDescription>
+            <p>입력 항목 {validation.fields.length}개를 추출했습니다.</p>
+            <dl className="mt-2 grid gap-1 text-xs">
+              <div><dt className="inline font-medium">제목: </dt><dd className="inline">{validation.defaults.title || "지정 안 됨"}</dd></div>
+              <div><dt className="inline font-medium">안내 문구: </dt><dd className="inline">{validation.defaults.description || "지정 안 됨"}</dd></div>
+              <div><dt className="inline font-medium">제출 버튼: </dt><dd className="inline">{validation.defaults.submitLabel || "지정 안 됨"}</dd></div>
+            </dl>
+          </AlertDescription></Alert>}
           {saved && <Alert className="mt-5"><CheckCircle2Icon /><AlertTitle>템플릿을 등록했습니다</AlertTitle><AlertDescription>이제 캠페인 생성에서 이 템플릿을 선택할 수 있습니다.</AlertDescription></Alert>}
         </CardContent>
         <CardFooter className="justify-between">

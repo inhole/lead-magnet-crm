@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 
+import { extractFormCopy } from "@/lib/forms/render-template"
 import { validateFormHtml } from "@/lib/forms/validate-html"
 import { createClient } from "@/lib/supabase/server"
 
@@ -12,7 +13,7 @@ export async function GET() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ code: "UNAUTHENTICATED", message: "로그인이 필요합니다." }, { status: 401 })
-  const { data, error } = await supabase.from("html_templates").select("id,name,input_schema,created_at").order("created_at", { ascending: false })
+  const { data, error } = await supabase.from("html_templates").select("id,name,input_schema,created_at,default_title,default_description,default_submit_label").order("created_at", { ascending: false })
   if (error) return NextResponse.json({ code: "DATABASE_ERROR", message: "템플릿 목록을 불러오지 못했습니다." }, { status: 500 })
   return NextResponse.json({ templates: data })
 }
@@ -40,7 +41,17 @@ export async function POST(request: Request) {
   const { error: uploadError } = await supabase.storage.from("html-templates").upload(storagePath, result.html, { contentType: "text/html", upsert: false })
   if (uploadError) return NextResponse.json({ code: "STORAGE_ERROR", message: "HTML 파일을 저장하지 못했습니다." }, { status: 500 })
 
-  const { data, error: insertError } = await supabase.from("html_templates").insert({ id: templateId, owner_id: user.id, name: name.trim(), storage_path: storagePath, input_schema: result.fields }).select("id,name,input_schema,created_at").single()
+  const copy = extractFormCopy(result.html)
+  const { data, error: insertError } = await supabase.from("html_templates").insert({
+    id: templateId,
+    owner_id: user.id,
+    name: name.trim(),
+    storage_path: storagePath,
+    input_schema: result.fields,
+    default_title: copy.title,
+    default_description: copy.description,
+    default_submit_label: copy.submitLabel,
+  }).select("id,name,input_schema,created_at,default_title,default_description,default_submit_label").single()
   if (insertError) {
     await supabase.storage.from("html-templates").remove([storagePath])
     return NextResponse.json({ code: "DATABASE_ERROR", message: "템플릿 정보를 저장하지 못했습니다." }, { status: 500 })
