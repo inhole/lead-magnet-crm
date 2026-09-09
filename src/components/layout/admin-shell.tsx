@@ -42,16 +42,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             lead<span className="text-muted-foreground">/</span>magnet
           </Link>
           <nav className="order-3 grid w-full grid-cols-4 gap-1 sm:order-none sm:flex sm:w-auto" aria-label="주 메뉴">
-            <Link href="/" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full", pathname === "/" && "bg-muted")}>
+            <Link href="/" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full sm:w-auto", pathname === "/" && "bg-muted")}>
               <MegaphoneIcon data-icon="inline-start" />캠페인
             </Link>
-            <Link href="/performance" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full", pathname === "/performance" && "bg-muted")}>
+            <Link href="/performance" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full sm:w-auto", pathname === "/performance" && "bg-muted")}>
               <BarChart3Icon data-icon="inline-start" />성과
             </Link>
-            <Link href="/templates/new" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full", pathname.startsWith("/templates") && "bg-muted")}>
+            <Link href="/templates/new" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full sm:w-auto", pathname.startsWith("/templates") && "bg-muted")}>
               <FileCode2Icon data-icon="inline-start" />템플릿
             </Link>
-            <Link href="/api-docs" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full")}>
+            <Link href="/api-docs" target="_blank" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full sm:w-auto")}>
               <BookOpenIcon data-icon="inline-start" />API 문서
             </Link>
           </nav>
