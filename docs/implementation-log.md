@@ -59,8 +59,9 @@
 
 ## P08 — API·ADR·실행 문서 정합성
 
-- 상태: 로컬 검증 완료, PR 원격 CI 대기
+- 상태: 로컬 및 PR 원격 검증 완료
 - 변경: 인증·템플릿·캠페인·배포·공개 신청·CRM·성과 OpenAPI 3.1 계약, `/api/openapi` 원본과 공개 `/api-docs` Swagger UI, 구현 Route 정합성 테스트
 - 문서: README 로컬·연결 Supabase 및 전체 테스트 실행 절차, ADR-005 JSONB·ADR-006 API 경계·ADR-007 UI 범위, 실행계획 현재 상태 갱신
 - 검증: `npm run test:unit` 25건, `npm run lint`, `npm run typecheck`, `npm run build`, `npm audit --audit-level=high` 통과
-- 미완료: 현재 커밋 PR CI와 연결된 Supabase·Vercel 환경의 성공 흐름은 각각 P08 완료 판정과 P09에서 확인
+- 원격 검증: PR #15에서 PR 정책, 결과 집계, lint·typecheck·build, 단위 테스트, 실제 DB 통합 테스트, Chromium E2E, Vercel Preview 통과
+- 미완료: 연결된 Supabase·Vercel 환경의 전체 성공 흐름과 새 환경 재현은 P09에서 확인
