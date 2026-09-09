@@ -18,6 +18,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ pub
   const validation = validateSubmissionValues(body.values, publicForm.input_schema)
   if (!validation.ok) return NextResponse.json({ code: "VALIDATION_ERROR", message: "입력값을 확인하세요.", fieldErrors: validation.fieldErrors }, { status: 400 })
   const { data, error } = await createServiceClient().rpc("create_public_submission", { p_public_id: publicId, p_visit_id: body.visitId, p_idempotency_key: body.idempotencyKey, p_values: validation.values }).single()
+  if (error?.code === "P0002") return NextResponse.json({ code: "NOT_FOUND", message: "공개 폼을 찾을 수 없습니다." }, { status: 404 })
   if (error?.code === "P0003") return NextResponse.json({ code: "INVALID_VISIT", message: "유효하지 않은 방문 정보입니다." }, { status: 400 })
   if (error?.code === "P0004") return NextResponse.json({ code: "IDEMPOTENCY_CONFLICT", message: "같은 전송 키로 다른 신청을 보낼 수 없습니다." }, { status: 409 })
   if (error || !data) return NextResponse.json({ code: "DATABASE_ERROR", message: "신청을 저장하지 못했습니다." }, { status: 500 })

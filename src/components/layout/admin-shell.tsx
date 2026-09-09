@@ -41,17 +41,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Link href="/" className="mr-auto text-lg font-bold tracking-tight">
             lead<span className="text-muted-foreground">/</span>magnet
           </Link>
-          <nav className="order-3 flex w-full items-center gap-1 overflow-x-auto sm:order-none sm:w-auto" aria-label="주 메뉴">
-            <Link href="/" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), pathname === "/" && "bg-muted")}>
+          <nav className="order-3 grid w-full grid-cols-4 gap-1 sm:order-none sm:flex sm:w-auto" aria-label="주 메뉴">
+            <Link href="/" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full", pathname === "/" && "bg-muted")}>
               <MegaphoneIcon data-icon="inline-start" />캠페인
             </Link>
-            <Link href="/#overview" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+            <Link href="/performance" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full", pathname === "/performance" && "bg-muted")}>
               <BarChart3Icon data-icon="inline-start" />성과
             </Link>
-            <Link href="/templates/new" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), pathname.startsWith("/templates") && "bg-muted")}>
+            <Link href="/templates/new" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full", pathname.startsWith("/templates") && "bg-muted")}>
               <FileCode2Icon data-icon="inline-start" />템플릿
             </Link>
-            <Link href="/api-docs" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+            <Link href="/api-docs" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full")}>
               <BookOpenIcon data-icon="inline-start" />API 문서
             </Link>
           </nav>

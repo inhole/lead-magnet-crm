@@ -189,6 +189,25 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '500': { $ref: '#/components/responses/DatabaseError' }
         '503': { $ref: '#/components/responses/NotConfigured' }
+    patch:
+      tags: [캠페인]
+      summary: 캠페인 공개 상태 변경
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [published]
+              properties: { published: { type: boolean } }
+      responses:
+        '200': { description: 공개 상태 변경됨 }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
   /api/campaigns/{id}/links:
     parameters: [{ $ref: '#/components/parameters/CampaignId' }]
     get:
@@ -355,11 +374,12 @@ components:
         template_id: { type: string, format: uuid }
     Campaign:
       type: object
-      required: [id, name, created_at, campaign_forms]
+      required: [id, name, created_at, published_at, campaign_forms]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
         created_at: { type: string, format: date-time }
+        published_at: { type: [string, 'null'], format: date-time }
         campaign_forms: { type: array, items: { $ref: '#/components/schemas/CampaignForm' } }
     CampaignCreated:
       allOf:

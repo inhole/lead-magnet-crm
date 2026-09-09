@@ -16,7 +16,7 @@ const expectedOperations: Record<string, string[]> = {
   "/api/templates/validate": ["post"],
   "/api/templates/sample": ["get"],
   "/api/campaigns": ["get", "post"],
-  "/api/campaigns/{id}": ["get"],
+  "/api/campaigns/{id}": ["get", "patch"],
   "/api/campaigns/{id}/links": ["get", "post"],
   "/api/campaigns/{id}/metrics": ["get"],
   "/api/campaigns/{id}/submissions": ["get"],

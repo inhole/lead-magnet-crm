@@ -89,3 +89,6 @@
 - UI 수정: Input 높이와 마지막 필드 하단 여백을 보정하고 누락된 popover 테마 토큰과 모달 배경 명암을 추가
 - 검증: `npm run lint`, `npm run typecheck`, `npm run test:unit` 28건, `npm run build`, 로그인 화면 브라우저 렌더링·계산 스타일·콘솔 오류 확인 통과
 - 미실행: Docker Desktop 엔진이 시작되지 않아 새 마이그레이션 기반 통합 테스트와 Playwright E2E는 현재 로컬에서 실행하지 못함
+- 2차 QA: 전체 성과를 `/performance`로 분리하고 GNB의 임시 가로 스크롤을 제거했으며, 캠페인의 공개/미공개 상태와 공개 폼·방문·신청 차단 경계를 추가
+- 원격 DB 진단: `202609090001` 미적용으로 전체 성과·채널 링크 RPC가 없어 운영 환경에서 `DATABASE_ERROR`가 발생함을 migration list로 확인
+- 적용 대기: 원격 dry-run에서 `202609090001_post_p10_qa.sql`, `202609090002_campaign_publication.sql` 두 건만 적용 대상으로 확인
