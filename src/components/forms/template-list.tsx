@@ -48,7 +48,7 @@ export function TemplateList() {
     <div className="overflow-hidden rounded-2xl border bg-card/55">
       <Table>
         <TableHeader><TableRow><TableHead>템플릿 이름</TableHead><TableHead>입력 항목</TableHead><TableHead className="text-right">등록일</TableHead></TableRow></TableHeader>
-        <TableBody>{templates.map((template) => <TableRow key={template.id}><TableCell className="font-medium">{template.name}</TableCell><TableCell><Badge variant="secondary">{template.input_schema.length}개</Badge></TableCell><TableCell className="text-right"><time dateTime={template.created_at} className="text-sm text-muted-foreground">{koreaTime(template.created_at)}</time></TableCell></TableRow>)}</TableBody>
+        <TableBody>{templates.map((template) => <TableRow key={template.id}><TableCell className="font-medium"><Link href={`/templates/${template.id}`} className="underline-offset-4 hover:underline">{template.name}</Link></TableCell><TableCell><Badge variant="secondary">{template.input_schema.length}개</Badge></TableCell><TableCell className="text-right"><time dateTime={template.created_at} className="text-sm text-muted-foreground">{koreaTime(template.created_at)}</time></TableCell></TableRow>)}</TableBody>
       </Table>
     </div>
   )

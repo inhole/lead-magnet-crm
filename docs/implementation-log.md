@@ -97,6 +97,7 @@
 
 - 상태: 로컬 구현 및 전체 검증 완료
 - 이슈: #24
-- 변경: `/templates` 소유 템플릿 목록, 템플릿 미리보기 API, 캠페인 Select 이름 표시, 업로드 HTML 기반 커스텀 미리보기·공개 신청 폼
+- 변경: `/templates` 소유 템플릿 목록·상세, 템플릿 미리보기 API, 캠페인 Select 이름 표시, HTML 등록 단계의 문구 커스텀 미리보기, 업로드 HTML 기반 공개 신청 폼
+- UX: 캠페인 등록 CTA를 캠페인 목록으로 이동하고, 공개 iframe의 테두리·외부 여백을 제거했으며 콘텐츠 높이를 메시지로 동기화해 내부 스크롤을 없앰
 - 격리: 저장 HTML 재검증, sandbox iframe, CSP `form-action 'none'`, iframe window와 일회성 토큰을 함께 확인하는 시스템 제출 브리지
-- 검증: lint, typecheck, 단위 테스트 32건, 실제 Supabase 통합 테스트 6건, 데스크톱·모바일 E2E 10건, 프로덕션 build 통과
+- 검증: lint, typecheck, 단위 테스트 34건, 실제 Supabase 통합 테스트 6건, 데스크톱·모바일 E2E 10건, 프로덕션 build 통과

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type FormEvent } from "react"
+import { useMemo, useState, type FormEvent } from "react"
 import { CheckCircle2Icon, CheckIcon, CopyIcon, FileCode2Icon, UploadIcon } from "lucide-react"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -9,7 +9,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
+import { Textarea } from "@/components/ui/textarea"
 import { HTML_TEMPLATE_AI_PROMPT } from "@/lib/forms/ai-prompt"
+import { customizeFormHtml } from "@/lib/forms/render-template"
 import type { FormFieldSchema, HtmlValidationError } from "@/lib/forms/types"
 
 type Validation = { preview: string; fields: FormFieldSchema[] }
@@ -22,6 +24,8 @@ export function HtmlUpload() {
   const [pending, setPending] = useState<"validate" | "save" | null>(null)
   const [saved, setSaved] = useState(false)
   const [promptCopied, setPromptCopied] = useState(false)
+  const [previewCopy, setPreviewCopy] = useState({ title: "커스텀 신청 폼", description: "신청 정보를 입력해 주세요.", submitLabel: "신청하기" })
+  const customizedPreview = useMemo(() => validation ? customizeFormHtml(validation.preview, previewCopy) : "", [previewCopy, validation])
 
   async function validate(selectedFile: File) {
     setPending("validate")
@@ -114,9 +118,10 @@ export function HtmlUpload() {
           <CardTitle className="flex items-center gap-2"><FileCode2Icon />격리 미리보기</CardTitle>
           <CardDescription>미리보기에서는 방문이나 신청을 기록하지 않으며 외부 실행을 차단합니다.</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-1">
+        <CardContent className="flex flex-1 flex-col gap-5">
+          {validation ? <FieldGroup><Field><FieldLabel htmlFor="preview-title">미리보기 제목</FieldLabel><Input id="preview-title" value={previewCopy.title} maxLength={160} onChange={(event) => setPreviewCopy({ ...previewCopy, title: event.target.value })} /></Field><Field><FieldLabel htmlFor="preview-description">미리보기 안내 문구</FieldLabel><Textarea id="preview-description" value={previewCopy.description} maxLength={1000} onChange={(event) => setPreviewCopy({ ...previewCopy, description: event.target.value })} /><FieldDescription>미리보기용 문구이며 캠페인을 만들 때 최종 확정합니다.</FieldDescription></Field><Field><FieldLabel htmlFor="preview-submit-label">미리보기 버튼 문구</FieldLabel><Input id="preview-submit-label" value={previewCopy.submitLabel} maxLength={40} onChange={(event) => setPreviewCopy({ ...previewCopy, submitLabel: event.target.value })} /></Field></FieldGroup> : null}
           {validation ? (
-            <iframe title="등록할 HTML 템플릿 미리보기" sandbox="" srcDoc={validation.preview} className="min-h-[500px] w-full rounded-lg border bg-white" />
+            <iframe title="등록할 HTML 템플릿 미리보기" sandbox="" srcDoc={customizedPreview} className="min-h-[500px] w-full rounded-lg border bg-white" />
           ) : (
             <div className="flex min-h-[500px] w-full items-center justify-center rounded-lg border border-dashed text-center text-sm text-muted-foreground">
               HTML 파일을 선택하면 안전성 검증 후 미리보기가 표시됩니다.

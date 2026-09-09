@@ -151,7 +151,7 @@ paths:
       summary: 소유 HTML 템플릿 격리 미리보기
       security: [{ cookieAuth: [] }]
       responses:
-        '200': { description: 격리 미리보기 HTML, content: { application/json: { schema: { type: object, required: [preview], properties: { preview: { type: string } } } } } }
+        '200': { description: 템플릿 메타데이터와 격리 미리보기 HTML, content: { application/json: { schema: { type: object, required: [template, preview], properties: { template: { $ref: '#/components/schemas/Template' }, preview: { type: string } } } } } }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '404': { $ref: '#/components/responses/NotFound' }
         '500': { $ref: '#/components/responses/DatabaseError' }

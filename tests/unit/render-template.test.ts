@@ -25,5 +25,7 @@ describe("HTML 템플릿 렌더링", () => {
     expect(result).toContain("script-src 'unsafe-inline'")
     expect(result).toContain('channel:"lead-magnet-form"')
     expect(result).toContain('const token="bridge-token"')
+    expect(result).toContain('type:"resize"')
+    expect(result).toContain("ResizeObserver")
   })
 })

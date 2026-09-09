@@ -23,6 +23,13 @@ type BridgeSubmitMessage = {
   entries: Array<[string, string]>
 }
 
+type BridgeResizeMessage = {
+  channel: "lead-magnet-form"
+  token: string
+  type: "resize"
+  height: number
+}
+
 function isBridgeSubmitMessage(value: unknown): value is BridgeSubmitMessage {
   if (!value || typeof value !== "object") return false
   const message = value as Partial<BridgeSubmitMessage>
@@ -31,6 +38,12 @@ function isBridgeSubmitMessage(value: unknown): value is BridgeSubmitMessage {
     && typeof message.token === "string"
     && Array.isArray(message.entries)
     && message.entries.every((entry) => Array.isArray(entry) && entry.length === 2 && entry.every((item) => typeof item === "string"))
+}
+
+function isBridgeResizeMessage(value: unknown): value is BridgeResizeMessage {
+  if (!value || typeof value !== "object") return false
+  const message = value as Partial<BridgeResizeMessage>
+  return message.channel === "lead-magnet-form" && message.type === "resize" && typeof message.token === "string" && typeof message.height === "number" && Number.isFinite(message.height)
 }
 
 function valuesFromEntries(fields: FormField[], entries: Array<[string, string]>) {
@@ -49,6 +62,7 @@ export function PublicForm({ publicId }: { publicId: string }) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [pending, setPending] = useState(false)
   const [complete, setComplete] = useState(false)
+  const [iframeHeight, setIframeHeight] = useState(320)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const formRef = useRef<PublicFormData | null>(null)
   const visitIdRef = useRef("")
@@ -76,7 +90,9 @@ export function PublicForm({ publicId }: { publicId: string }) {
     async function receive(event: MessageEvent) {
       const activeForm = formRef.current
       const activeVisitId = visitIdRef.current
-      if (!activeForm || !activeVisitId || event.source !== iframeRef.current?.contentWindow || !isBridgeSubmitMessage(event.data) || event.data.token !== activeForm.bridge_token || pendingRef.current) return
+      if (!activeForm || event.source !== iframeRef.current?.contentWindow) return
+      if (isBridgeResizeMessage(event.data) && event.data.token === activeForm.bridge_token) { setIframeHeight(Math.min(20000, Math.max(320, event.data.height + 2))); return }
+      if (!activeVisitId || !isBridgeSubmitMessage(event.data) || event.data.token !== activeForm.bridge_token || pendingRef.current) return
       pendingRef.current = true
       setPending(true); setError(""); setFieldErrors({})
       const values = valuesFromEntries(activeForm.input_schema, event.data.entries)
@@ -105,5 +121,5 @@ export function PublicForm({ publicId }: { publicId: string }) {
   if (error && !form) return <Alert variant="destructive"><AlertTitle>폼을 열 수 없습니다</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>
   if (!form || !visitId) return <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground"><Spinner /> 폼을 불러오는 중입니다.</div>
 
-  return <div className="flex flex-col gap-4"><iframe ref={iframeRef} title={form.title} sandbox="allow-scripts allow-forms" srcDoc={form.html} className="min-h-[720px] w-full rounded-lg border-0 bg-white" />{pending ? <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground"><Spinner /> 신청을 저장하고 있습니다.</div> : null}{error ? <Alert variant="destructive"><AlertTitle>신청을 저장하지 못했습니다</AlertTitle><AlertDescription>{error}{Object.values(fieldErrors).length ? ` ${Object.values(fieldErrors).join(" ")}` : ""}</AlertDescription></Alert> : null}</div>
+  return <div className="flex flex-col gap-4"><iframe ref={iframeRef} title={form.title} sandbox="allow-scripts allow-forms" srcDoc={form.html} style={{ height: iframeHeight }} className="block w-full border-0 bg-white" />{pending ? <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground"><Spinner /> 신청을 저장하고 있습니다.</div> : null}{error ? <Alert variant="destructive"><AlertTitle>신청을 저장하지 못했습니다</AlertTitle><AlertDescription>{error}{Object.values(fieldErrors).length ? ` ${Object.values(fieldErrors).join(" ")}` : ""}</AlertDescription></Alert> : null}</div>
 }

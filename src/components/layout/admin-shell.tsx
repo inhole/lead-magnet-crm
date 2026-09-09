@@ -1,6 +1,6 @@
 "use client"
 
-import { BarChart3Icon, BookOpenIcon, FileCode2Icon, LogOutIcon, MegaphoneIcon, PlusIcon } from "lucide-react"
+import { BarChart3Icon, BookOpenIcon, FileCode2Icon, LogOutIcon, MegaphoneIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -59,9 +59,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Button type="button" variant="ghost" size="sm" onClick={logout} disabled={pending}>
             <LogOutIcon data-icon="inline-start" />{pending ? "로그아웃 중" : "로그아웃"}
           </Button>
-          <Link href="/campaigns/new" className={buttonVariants({ size: "sm" })}>
-            <PlusIcon data-icon="inline-start" />새 캠페인
-          </Link>
         </div>
       </header>
       {children}
