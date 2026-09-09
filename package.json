@@ -14,6 +14,7 @@
     "test:integration:ci": "vitest run --config vitest.integration.config.mts --reporter=json --outputFile=reports/integration-results.json",
     "test:e2e": "playwright test",
     "test:e2e:ci": "playwright test",
+    "test:deployment:smoke": "node scripts/deployment/smoke.mjs",
     "test:policy": "node --test .github/scripts/pr-policy.test.mjs"
   },
   "dependencies": {

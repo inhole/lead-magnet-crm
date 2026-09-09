@@ -69,3 +69,9 @@ npm run test:e2e
 ```
 
 CI는 `npm ci` 후 lint·typecheck·build, 단위 테스트, 새 로컬 Supabase 통합 테스트, 데스크톱·모바일 Chromium E2E를 각각 실행합니다.
+
+배포 후에는 데이터를 변경하지 않는 공개 경로 스모크 검사를 실행합니다. 원격 migration 적용과 운영자 A/B 전체 흐름은 [배포 및 새 DB 재현 런북](docs/deployment-runbook.md)을 따릅니다.
+
+```bash
+npm run test:deployment:smoke -- https://<production-domain>
+```
