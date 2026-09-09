@@ -9,9 +9,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
+import type { FormFieldSchema } from "@/lib/forms/types"
 
-type FormField = { name: string; label: string; type: string; required: boolean }
-type Campaign = { id: string; name: string; published_at: string | null; campaign_forms: Array<{ public_id: string; title: string; description: string; submit_label: string; html_templates: { name: string; input_schema: FormField[] } | null }> }
+type Campaign = { id: string; name: string; published_at: string | null; campaign_forms: Array<{ public_id: string; title: string; description: string; submit_label: string; html_templates: { name: string; input_schema: FormFieldSchema[] } | null }> }
 type DistributionLink = { channel: string; link_token: string }
 const LABELS: Record<string, string> = { instagram: "인스타그램", x: "X", youtube: "유튜브", threads: "스레드" }
 

@@ -11,4 +11,16 @@ describe("실제 Supabase 권한·신청·집계", () => {
   it("폼 생성 시 만들어진 배포 링크를 읽기 전용으로 조회한다", async () => { const links = await ownerClient.rpc("get_campaign_links", { p_campaign_id: ids.campaign }); expect(links.error).toBeNull(); expect((links.data as Array<{ channel: string }>).map(link => link.channel)).toEqual(["instagram", "threads", "x", "youtube"]); const again = await ownerClient.rpc("get_campaign_links", { p_campaign_id: ids.campaign }); expect(again.data).toEqual(links.data); expect((await otherClient.rpc("get_campaign_links", { p_campaign_id: ids.campaign })).error?.code).toBe("P0002") })
   it("워크스페이스 전체 성과를 집계한다", async () => { const result = await ownerClient.rpc("get_workspace_metrics"); expect(result.error).toBeNull(); expect(result.data).toMatchObject({ campaigns: 1, visits: 1, visitors: 1, submissions: 1, convertedVisitors: 1 }) })
   it("미공개 캠페인은 공개 폼 조회와 신규 방문을 차단한다", async () => { expect((await ownerClient.from("campaigns").update({ published_at: null }).eq("id", ids.campaign)).error).toBeNull(); expect((await admin.rpc("get_public_form", { p_public_id: ids.publicId }).maybeSingle()).data).toBeNull(); expect((await admin.rpc("record_public_visit", { p_public_id: ids.publicId, p_link_token: null, p_visitor_id: crypto.randomUUID(), p_event_key: crypto.randomUUID() })).error?.code).toBe("P0002"); expect((await ownerClient.from("campaigns").update({ published_at: new Date().toISOString() }).eq("id", ids.campaign)).error).toBeNull() })
+  it("value·label 객체 형태의 선택지 스키마를 저장하고 그대로 조회한다", async () => {
+    const withGroups = [
+      { name: "email", label: "이메일", type: "email", required: true },
+      { name: "interest", label: "관심 분야", type: "radio", required: true, options: [{ value: "sales", label: "영업" }, { value: "marketing", label: "마케팅" }] },
+      { name: "channels", label: "수신 채널", type: "checkbox", required: false, options: [{ value: "email", label: "이메일" }, { value: "sms", label: "문자" }] },
+    ]
+    expect((await admin.from("html_templates").update({ input_schema: withGroups }).eq("id", ids.template)).error).toBeNull()
+    const stored = await admin.from("html_templates").select("input_schema").eq("id", ids.template).single()
+    expect(stored.error).toBeNull()
+    expect(stored.data?.input_schema).toEqual(withGroups)
+    await admin.from("html_templates").update({ input_schema: [{ name: "email", label: "이메일", type: "email", required: true }] }).eq("id", ids.template)
+  })
 })

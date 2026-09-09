@@ -357,7 +357,7 @@ components:
         label: { type: string }
         type: { type: string, enum: [text, email, tel, number, textarea, select, checkbox, radio] }
         required: { type: boolean }
-        options: { type: array, items: { type: string } }
+        options: { type: array, items: { type: object, required: [value, label], properties: { value: { type: string }, label: { type: string } } } }
     Template:
       type: object
       required: [id, name, input_schema, created_at]

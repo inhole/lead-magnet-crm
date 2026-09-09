@@ -23,6 +23,14 @@
           <option value="marketing">마케팅</option>
           <option value="sales">영업</option>
         </select>
+        <div data-form-group-label="관심 분야">
+          <label><input name="interest" type="radio" value="report" required> 리포트</label>
+          <label><input name="interest" type="radio" value="webinar"> 웨비나</label>
+        </div>
+        <div data-form-group-label="수신 채널">
+          <label><input name="channels" type="checkbox" value="email"> 이메일</label>
+          <label><input name="channels" type="checkbox" value="sms"> 문자</label>
+        </div>
         <button type="submit" data-form-submit>체크리스트 신청하기</button>
       </form>
     </main>
