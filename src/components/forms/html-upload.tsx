@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, type FormEvent } from "react"
-import { CheckCircle2Icon, FileCode2Icon, UploadIcon } from "lucide-react"
+import { CheckCircle2Icon, CheckIcon, CopyIcon, FileCode2Icon, UploadIcon } from "lucide-react"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -12,6 +12,17 @@ import { Spinner } from "@/components/ui/spinner"
 import type { FormFieldSchema, HtmlValidationError } from "@/lib/forms/types"
 
 type Validation = { preview: string; fields: FormFieldSchema[] }
+const AI_PROMPT = `리드 수집용 단일 HTML 신청 폼을 만들어줘. 결과는 설명이나 마크다운 없이 완전한 HTML만 출력해줘.
+
+규칙:
+- form 요소는 정확히 1개만 사용하고 action 속성은 넣지 않는다.
+- 제목에는 data-form-title, 설명에는 data-form-description, 제출 버튼에는 data-form-submit 속성을 넣는다.
+- 모든 input, textarea, select에는 고유한 name과 연결된 label을 둔다.
+- 지원 입력 타입은 text, email, tel, number, date, checkbox, radio이며 필요한 항목은 required로 표시한다.
+- script, iframe, 외부 URL, 외부 CSS/폰트, 이벤트 핸들러(onclick 등)는 사용하지 않는다.
+- 개인정보는 최소한으로 요청하고 모바일에서도 읽기 쉽게 작성한다.
+
+폼 주제: [여기에 리드마그넷과 수집할 정보 입력]`
 
 export function HtmlUpload() {
   const [name, setName] = useState("")
@@ -20,6 +31,7 @@ export function HtmlUpload() {
   const [errors, setErrors] = useState<HtmlValidationError[]>([])
   const [pending, setPending] = useState<"validate" | "save" | null>(null)
   const [saved, setSaved] = useState(false)
+  const [promptCopied, setPromptCopied] = useState(false)
 
   async function validate(selectedFile: File) {
     setPending("validate")
@@ -52,6 +64,29 @@ export function HtmlUpload() {
 
   return (
     <form onSubmit={submit} className="grid gap-6 xl:grid-cols-[minmax(0,440px)_1fr]">
+      <Card className="xl:col-span-2">
+        <CardHeader>
+          <CardTitle>작성 규칙과 AI 프롬프트</CardTitle>
+          <CardDescription>아래 계약에 맞는 HTML만 등록할 수 있습니다. AI에게 요청할 때는 예시 프롬프트를 복사해 주제만 바꾸세요.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-5 lg:grid-cols-[minmax(260px,0.7fr)_1fr]">
+          <ul className="flex list-disc flex-col gap-2 pl-5 text-sm text-muted-foreground">
+            <li>form은 1개만 사용하고 action은 비워 둡니다.</li>
+            <li>입력 항목마다 고유한 name과 연결된 label이 필요합니다.</li>
+            <li>제목·설명·버튼에 data-form-title, data-form-description, data-form-submit을 지정합니다.</li>
+            <li>script, iframe, 외부 URL, 이벤트 핸들러는 허용하지 않습니다.</li>
+          </ul>
+          <div className="min-w-0">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <p className="text-sm font-medium">AI 생성 요청 예시</p>
+              <Button type="button" variant="outline" size="sm" onClick={async () => { await navigator.clipboard.writeText(AI_PROMPT); setPromptCopied(true) }}>
+                {promptCopied ? <CheckIcon data-icon="inline-start" /> : <CopyIcon data-icon="inline-start" />}{promptCopied ? "복사됨" : "프롬프트 복사"}
+              </Button>
+            </div>
+            <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-muted p-4 text-xs leading-relaxed">{AI_PROMPT}</pre>
+          </div>
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>HTML 파일 등록</CardTitle>

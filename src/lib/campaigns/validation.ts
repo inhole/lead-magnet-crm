@@ -49,3 +49,10 @@ export function validateCampaignInput(input: unknown): CampaignValidationResult 
 export function publicFormPath(publicId: string) {
   return `/f/${encodeURIComponent(publicId)}`
 }
+
+export function validateCampaignPublication(input: unknown) {
+  if (!input || typeof input !== "object" || typeof (input as Record<string, unknown>).published !== "boolean") {
+    return { ok: false as const }
+  }
+  return { ok: true as const, published: (input as { published: boolean }).published }
+}

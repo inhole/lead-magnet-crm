@@ -15,7 +15,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("campaigns")
-    .select("id,name,created_at,campaign_forms(id,public_id,title,description,submit_label,template_id)")
+    .select("id,name,created_at,published_at,campaign_forms(id,public_id,title,description,submit_label,template_id)")
     .order("created_at", { ascending: false })
   if (error) return NextResponse.json({ code: "DATABASE_ERROR", message: "캠페인 목록을 불러오지 못했습니다." }, { status: 500 })
   const campaigns = (data ?? []).map((campaign) => ({

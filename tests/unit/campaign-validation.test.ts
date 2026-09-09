@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { publicFormPath, validateCampaignInput } from "../../src/lib/campaigns/validation"
+import { publicFormPath, validateCampaignInput, validateCampaignPublication } from "../../src/lib/campaigns/validation"
 
 const validInput = {
   name: "가을 리드 캠페인",
@@ -30,5 +30,10 @@ describe("캠페인 입력 검증", () => {
 
   it("공개 경로의 식별자를 안전하게 인코딩한다", () => {
     expect(publicFormPath("public/id")).toBe("/f/public%2Fid")
+  })
+
+  it("캠페인 공개 상태는 boolean만 허용한다", () => {
+    expect(validateCampaignPublication({ published: true })).toEqual({ ok: true, published: true })
+    expect(validateCampaignPublication({ published: "true" })).toEqual({ ok: false })
   })
 })

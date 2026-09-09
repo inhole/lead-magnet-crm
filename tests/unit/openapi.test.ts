@@ -8,6 +8,7 @@ type Operation = { responses?: Record<string, unknown>; security?: unknown[] }
 type Specification = { openapi?: string; paths?: Record<string, Record<string, Operation>> }
 
 const expectedOperations: Record<string, string[]> = {
+  "/api/metrics": ["get"],
   "/api/auth/login": ["post"],
   "/api/auth/logout": ["post"],
   "/api/auth/me": ["get"],
@@ -15,7 +16,7 @@ const expectedOperations: Record<string, string[]> = {
   "/api/templates/validate": ["post"],
   "/api/templates/sample": ["get"],
   "/api/campaigns": ["get", "post"],
-  "/api/campaigns/{id}": ["get"],
+  "/api/campaigns/{id}": ["get", "patch"],
   "/api/campaigns/{id}/links": ["get", "post"],
   "/api/campaigns/{id}/metrics": ["get"],
   "/api/campaigns/{id}/submissions": ["get"],
@@ -65,7 +66,7 @@ describe("OpenAPI 계약", () => {
         if (!["/api/auth/logout", "/api/auth/me", "/api/templates/sample"].includes(route)) {
           expect(Object.keys(operation?.responses ?? {}).some((status) => status.startsWith("4") || status.startsWith("5")), `${method.toUpperCase()} ${route} 실패 응답`).toBe(true)
         }
-        if (route === "/api/templates" || route.startsWith("/api/campaigns")) expect(operation?.security, `${method.toUpperCase()} ${route} 인증`).toEqual([{ cookieAuth: [] }])
+        if (route === "/api/metrics" || route === "/api/templates" || route.startsWith("/api/campaigns")) expect(operation?.security, `${method.toUpperCase()} ${route} 인증`).toEqual([{ cookieAuth: [] }])
       }
     }
   })

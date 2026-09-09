@@ -47,7 +47,7 @@ export default function LoginPage() {
             <CardDescription>운영자 계정으로 캠페인에 접근하세요.</CardDescription>
           </CardHeader>
           <form onSubmit={submit}>
-            <CardContent>
+            <CardContent className="pb-4">
               <FieldGroup>
                 <Field data-invalid={Boolean(error) || undefined}>
                   <FieldLabel htmlFor="email">이메일</FieldLabel>
