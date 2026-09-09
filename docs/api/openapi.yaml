@@ -14,6 +14,32 @@ tags:
   - name: 캠페인
   - name: 공개 폼
 paths:
+  /api/metrics:
+    get:
+      tags: [캠페인]
+      summary: 운영자 전체 캠페인 성과
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: 전체 캠페인 성과
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [metrics]
+                properties:
+                  metrics:
+                    type: object
+                    required: [campaigns, visits, visitors, submissions, convertedVisitors]
+                    properties:
+                      campaigns: { type: integer, minimum: 0 }
+                      visits: { type: integer, minimum: 0 }
+                      visitors: { type: integer, minimum: 0 }
+                      submissions: { type: integer, minimum: 0 }
+                      convertedVisitors: { type: integer, minimum: 0 }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
   /api/auth/login:
     post:
       tags: [인증]
