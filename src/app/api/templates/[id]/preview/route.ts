@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-import { buildTemplatePreview } from "@/lib/forms/render-template"
+import { buildTemplatePreview, extractFormCopy } from "@/lib/forms/render-template"
 import { validateFormHtml } from "@/lib/forms/validate-html"
 import { createClient } from "@/lib/supabase/server"
 
@@ -23,6 +23,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   if (!result.ok) return NextResponse.json({ code: "INVALID_HTML", message: "저장된 HTML이 작성 규칙을 통과하지 못했습니다." }, { status: 500 })
   return NextResponse.json({
     template: { id: template.id, name: template.name, input_schema: template.input_schema, created_at: template.created_at },
+    defaults: extractFormCopy(result.html),
     preview: buildTemplatePreview(result.html),
   })
 }

@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest"
 
-import { buildInteractiveTemplate, buildTemplatePreview, customizeFormHtml } from "@/lib/forms/render-template"
+import { buildInteractiveTemplate, buildTemplatePreview, customizeFormHtml, extractFormCopy } from "@/lib/forms/render-template"
 
 const html = `<main><h1 data-form-title>기존 제목</h1><p data-form-description>기존 설명</p><form><label for="email">이메일</label><input id="email" name="email" type="email"><button type="submit" data-form-submit>기존 버튼</button></form></main>`
 const copy = { title: "새 <제목>", description: "새 안내", submitLabel: "자료 받기" }
 
 describe("HTML 템플릿 렌더링", () => {
+  it("업로드 HTML의 기본 문구를 추출한다", () => {
+    expect(extractFormCopy(html)).toEqual({ title: "기존 제목", description: "기존 설명", submitLabel: "기존 버튼" })
+  })
+
   it("마커의 문구를 텍스트로 안전하게 교체한다", () => {
     const result = customizeFormHtml(html, copy)
     expect(result).toContain("새 &lt;제목&gt;")
