@@ -37,5 +37,5 @@ export function WorkspaceOverview() {
     ["전체 전환율", conversionRate(metrics)],
   ] as const
 
-  return <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{items.map(([label, value]) => <Card key={label} size="sm"><CardHeader><CardDescription>{label}</CardDescription><CardTitle className="text-2xl">{value}</CardTitle></CardHeader></Card>)}</div>
+  return <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{items.map(([label, value]) => <Card key={label} size="sm" aria-label={`${label} ${value}`}><CardHeader><CardDescription>{label}</CardDescription><CardTitle className="text-2xl">{value}</CardTitle></CardHeader></Card>)}</div>
 }
