@@ -225,12 +225,12 @@ paths:
     parameters: [{ $ref: '#/components/parameters/CampaignId' }]
     get:
       tags: [캠페인]
-      summary: 채널별 배포 링크 조회 및 누락 링크 생성
+      summary: 채널별 배포 링크 조회(읽기 전용)
       security: [{ cookieAuth: [] }]
       responses: { '200': { $ref: '#/components/responses/Links' }, '401': { $ref: '#/components/responses/Unauthenticated' }, '404': { $ref: '#/components/responses/NotFound' }, '500': { $ref: '#/components/responses/DatabaseError' }, '503': { $ref: '#/components/responses/NotConfigured' } }
     post:
       tags: [캠페인]
-      summary: 채널별 배포 링크 보장
+      summary: 누락된 채널별 배포 링크 복구
       security: [{ cookieAuth: [] }]
       responses: { '200': { $ref: '#/components/responses/Links' }, '401': { $ref: '#/components/responses/Unauthenticated' }, '404': { $ref: '#/components/responses/NotFound' }, '500': { $ref: '#/components/responses/DatabaseError' }, '503': { $ref: '#/components/responses/NotConfigured' } }
   /api/campaigns/{id}/metrics:
