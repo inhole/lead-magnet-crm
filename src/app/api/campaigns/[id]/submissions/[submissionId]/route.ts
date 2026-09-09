@@ -11,5 +11,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   if (error?.code === "P0002") return NextResponse.json({ code: "NOT_FOUND", message: "캠페인을 찾을 수 없습니다." }, { status: 404 })
   if (error) return NextResponse.json({ code: "DATABASE_ERROR", message: "신청 정보를 불러오지 못했습니다." }, { status: 500 })
   if (!data) return NextResponse.json({ code: "NOT_FOUND", message: "신청 정보를 찾을 수 없습니다." }, { status: 404 })
-  return NextResponse.json({ submission: data })
+  const submission = { ...(data as Record<string, unknown>), values: (data as Record<string, unknown>).form_values, form_values: undefined }
+  return NextResponse.json({ submission })
 }

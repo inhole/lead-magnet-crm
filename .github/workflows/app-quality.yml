@@ -60,3 +60,97 @@ jobs:
       - name: 테스트 실패 반영
         if: steps.unit-tests.outcome != 'success'
         run: exit 1
+
+  integration:
+    name: 실제 DB 통합 테스트
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: 로컬 Supabase 시작
+        run: npx supabase start
+      - name: 로컬 Supabase 환경 등록
+        run: |
+          npx supabase status -o json > "$RUNNER_TEMP/supabase-status.json"
+          node scripts/ci/supabase_env.mjs "$RUNNER_TEMP/supabase-status.json" "$GITHUB_ENV"
+      - id: integration-tests
+        name: 실제 DB 테스트 실행
+        continue-on-error: true
+        run: npm run test:integration:ci
+      - name: 테스트 건수 변환
+        if: always()
+        run: node scripts/ci/vitest_counts.mjs reports/integration-results.json reports/integration-counts.json
+      - name: 한국어 테스트 Summary
+        if: always()
+        run: python scripts/ci/korean_summary.py reports/integration-counts.json --label "실제 DB 통합 테스트"
+      - name: 결과 보관
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: reports/integration-*.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Supabase 종료
+        if: always()
+        run: npx supabase stop --no-backup
+      - name: 테스트 실패 반영
+        if: steps.integration-tests.outcome != 'success'
+        run: exit 1
+
+  e2e:
+    name: Chromium E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: 로컬 Supabase 시작
+        run: npx supabase start
+      - name: 로컬 Supabase 환경 등록
+        run: |
+          npx supabase status -o json > "$RUNNER_TEMP/supabase-status.json"
+          node scripts/ci/supabase_env.mjs "$RUNNER_TEMP/supabase-status.json" "$GITHUB_ENV"
+      - run: npm run build
+      - id: e2e-tests
+        name: 브라우저 테스트 실행
+        continue-on-error: true
+        run: npm run test:e2e:ci
+      - name: 테스트 건수 변환
+        if: always()
+        run: node scripts/ci/playwright_counts.mjs reports/e2e-results.json reports/e2e-counts.json
+      - name: 한국어 테스트 Summary
+        if: always()
+        run: python scripts/ci/korean_summary.py reports/e2e-counts.json --label "브라우저 E2E"
+      - name: 결과 보관
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results
+          path: |
+            reports/e2e-*.json
+            test-results/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Supabase 종료
+        if: always()
+        run: npx supabase stop --no-backup
+      - name: 테스트 실패 반영
+        if: steps.e2e-tests.outcome != 'success'
+        run: exit 1

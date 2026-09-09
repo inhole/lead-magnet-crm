@@ -10,5 +10,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const { data, error } = await supabase.rpc("get_campaign_submissions", { p_campaign_id: id, p_limit: 100 })
   if (error?.code === "P0002") return NextResponse.json({ code: "NOT_FOUND", message: "캠페인을 찾을 수 없습니다." }, { status: 404 })
   if (error) return NextResponse.json({ code: "DATABASE_ERROR", message: "신청자 목록을 불러오지 못했습니다." }, { status: 500 })
-  return NextResponse.json({ submissions: data ?? [] })
+  const submissions = (data ?? []).map((item: Record<string, unknown>) => ({ ...item, values: item.form_values, form_values: undefined }))
+  return NextResponse.json({ submissions })
 }
