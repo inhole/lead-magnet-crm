@@ -1,0 +1,403 @@
+openapi: 3.1.0
+info:
+  title: 리드마그넷 CRM API
+  version: 1.0.0
+  description: |
+    HTML 템플릿, 캠페인, 배포 링크, 공개 신청, CRM 및 성과 API 계약입니다.
+    운영자 API는 Supabase 세션 쿠키가 필요하고 공개 API는 인증 없이 사용할 수 있습니다.
+servers:
+  - url: /
+    description: 현재 배포 환경
+tags:
+  - name: 인증
+  - name: 템플릿
+  - name: 캠페인
+  - name: 공개 폼
+paths:
+  /api/auth/login:
+    post:
+      tags: [인증]
+      summary: 운영자 로그인
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, format: password }
+      responses:
+        '200': { description: 로그인 성공, content: { application/json: { schema: { $ref: '#/components/schemas/Ok' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/InvalidCredentials' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
+  /api/auth/logout:
+    post:
+      tags: [인증]
+      summary: 운영자 로그아웃
+      responses:
+        '200': { description: 로그아웃 완료, content: { application/json: { schema: { $ref: '#/components/schemas/Ok' } } } }
+  /api/auth/me:
+    get:
+      tags: [인증]
+      summary: 현재 운영자 확인
+      responses:
+        '200':
+          description: 현재 사용자 또는 비로그인 상태
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [user, configured]
+                properties:
+                  configured: { type: boolean }
+                  user:
+                    oneOf:
+                      - $ref: '#/components/schemas/User'
+                      - type: 'null'
+  /api/templates:
+    get:
+      tags: [템플릿]
+      summary: 소유 HTML 템플릿 목록
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: 템플릿 목록
+          content: { application/json: { schema: { type: object, required: [templates], properties: { templates: { type: array, items: { $ref: '#/components/schemas/Template' } } } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
+    post:
+      tags: [템플릿]
+      summary: HTML 템플릿 등록
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [name, file]
+              properties:
+                name: { type: string, maxLength: 120 }
+                file: { type: string, format: binary, description: 256KB 이하 HTML }
+      responses:
+        '201': { description: 생성됨, content: { application/json: { schema: { type: object, required: [template], properties: { template: { $ref: '#/components/schemas/Template' } } } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '413': { $ref: '#/components/responses/HtmlTooLarge' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
+  /api/templates/validate:
+    post:
+      tags: [템플릿]
+      summary: 저장하지 않고 HTML 검증 및 격리 미리보기 생성
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        '200':
+          description: 유효한 HTML
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [html, preview, fields]
+                properties:
+                  html: { type: string }
+                  preview: { type: string }
+                  fields: { type: array, items: { $ref: '#/components/schemas/FormField' } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '413': { $ref: '#/components/responses/HtmlTooLarge' }
+  /api/templates/sample:
+    get:
+      tags: [템플릿]
+      summary: 정상 HTML 샘플 다운로드
+      responses:
+        '200':
+          description: HTML 파일
+          content: { text/html: { schema: { type: string } } }
+  /api/campaigns:
+    get:
+      tags: [캠페인]
+      summary: 소유 캠페인 목록
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200': { description: 캠페인 목록, content: { application/json: { schema: { type: object, required: [campaigns], properties: { campaigns: { type: array, items: { $ref: '#/components/schemas/Campaign' } } } } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
+    post:
+      tags: [캠페인]
+      summary: 캠페인과 공개 폼 생성
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CampaignInput' }
+      responses:
+        '201': { description: 생성됨, content: { application/json: { schema: { type: object, required: [campaign], properties: { campaign: { $ref: '#/components/schemas/CampaignCreated' } } } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
+  /api/campaigns/{id}:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [캠페인]
+      summary: 캠페인 상세
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200': { description: 캠페인 상세, content: { application/json: { schema: { type: object, required: [campaign], properties: { campaign: { $ref: '#/components/schemas/Campaign' } } } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
+  /api/campaigns/{id}/links:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [캠페인]
+      summary: 채널별 배포 링크 조회 및 누락 링크 생성
+      security: [{ cookieAuth: [] }]
+      responses: { '200': { $ref: '#/components/responses/Links' }, '401': { $ref: '#/components/responses/Unauthenticated' }, '404': { $ref: '#/components/responses/NotFound' }, '500': { $ref: '#/components/responses/DatabaseError' }, '503': { $ref: '#/components/responses/NotConfigured' } }
+    post:
+      tags: [캠페인]
+      summary: 채널별 배포 링크 보장
+      security: [{ cookieAuth: [] }]
+      responses: { '200': { $ref: '#/components/responses/Links' }, '401': { $ref: '#/components/responses/Unauthenticated' }, '404': { $ref: '#/components/responses/NotFound' }, '500': { $ref: '#/components/responses/DatabaseError' }, '503': { $ref: '#/components/responses/NotConfigured' } }
+  /api/campaigns/{id}/metrics:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [캠페인]
+      summary: 전체 및 채널별 성과
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200': { description: 성과, content: { application/json: { schema: { type: object, required: [metrics], properties: { metrics: { type: array, items: { $ref: '#/components/schemas/Metric' } } } } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
+  /api/campaigns/{id}/submissions:
+    parameters: [{ $ref: '#/components/parameters/CampaignId' }]
+    get:
+      tags: [캠페인]
+      summary: 캠페인 신청자 목록(최근 100건)
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200': { description: 신청 목록, content: { application/json: { schema: { type: object, required: [submissions], properties: { submissions: { type: array, items: { $ref: '#/components/schemas/Submission' } } } } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
+  /api/campaigns/{id}/submissions/{submissionId}:
+    parameters:
+      - { $ref: '#/components/parameters/CampaignId' }
+      - { $ref: '#/components/parameters/SubmissionId' }
+    get:
+      tags: [캠페인]
+      summary: 신청 입력값 상세
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200': { description: 신청 상세, content: { application/json: { schema: { type: object, required: [submission], properties: { submission: { $ref: '#/components/schemas/Submission' } } } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
+  /api/public/forms/{publicId}:
+    parameters: [{ $ref: '#/components/parameters/PublicId' }]
+    get:
+      tags: [공개 폼]
+      summary: 공개 폼 조회
+      responses:
+        '200': { description: 공개 폼, content: { application/json: { schema: { type: object, required: [form], properties: { form: { $ref: '#/components/schemas/PublicForm' } } } } } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
+  /api/public/forms/{publicId}/visits:
+    parameters: [{ $ref: '#/components/parameters/PublicId' }]
+    post:
+      tags: [공개 폼]
+      summary: 방문 기록(이벤트 키 멱등)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [visitorId, eventKey]
+              properties:
+                visitorId: { type: string, format: uuid }
+                eventKey: { type: string, format: uuid }
+                linkToken: { type: [string, 'null'] }
+      responses:
+        '201': { description: 방문 생성 또는 기존 방문 반환, content: { application/json: { schema: { type: object, required: [visit], properties: { visit: { $ref: '#/components/schemas/Visit' } } } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
+  /api/public/forms/{publicId}/submissions:
+    parameters: [{ $ref: '#/components/parameters/PublicId' }]
+    post:
+      tags: [공개 폼]
+      summary: 공개 신청 저장(전송 키 멱등)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [visitId, idempotencyKey, values]
+              properties:
+                visitId: { type: string, format: uuid }
+                idempotencyKey: { type: string, format: uuid }
+                values: { type: object, additionalProperties: true }
+      responses:
+        '200': { description: 동일 전송 재시도 결과, content: { application/json: { schema: { type: object, required: [submission], properties: { submission: { $ref: '#/components/schemas/SubmissionResult' } } } } } }
+        '201': { description: 새 신청 생성, content: { application/json: { schema: { type: object, required: [submission], properties: { submission: { $ref: '#/components/schemas/SubmissionResult' } } } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { description: 같은 키의 다른 payload, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sb-access-token
+      description: 로그인 응답이 설정하는 Supabase 세션 쿠키. 실제 쿠키 이름은 프로젝트 ref에 따라 달라집니다.
+  parameters:
+    CampaignId: { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    SubmissionId: { name: submissionId, in: path, required: true, schema: { type: string, format: uuid } }
+    PublicId: { name: publicId, in: path, required: true, schema: { type: string } }
+  schemas:
+    Ok: { type: object, required: [ok], properties: { ok: { type: boolean, const: true } } }
+    User: { type: object, required: [id], properties: { id: { type: string, format: uuid }, email: { type: [string, 'null'], format: email } } }
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        fieldErrors: { type: object, additionalProperties: { type: string } }
+        errors: { type: array, items: { type: object, required: [code, message], properties: { code: { type: string }, message: { type: string } } } }
+    FormField:
+      type: object
+      required: [name, label, type, required]
+      properties:
+        name: { type: string }
+        label: { type: string }
+        type: { type: string, enum: [text, email, tel, number, textarea, select, checkbox, radio] }
+        required: { type: boolean }
+        options: { type: array, items: { type: string } }
+    Template:
+      type: object
+      required: [id, name, input_schema, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        input_schema: { type: array, items: { $ref: '#/components/schemas/FormField' } }
+        created_at: { type: string, format: date-time }
+    CampaignInput:
+      type: object
+      required: [name, templateId, title, description, submitLabel]
+      properties:
+        name: { type: string, maxLength: 120 }
+        templateId: { type: string, format: uuid }
+        title: { type: string, maxLength: 160 }
+        description: { type: string, maxLength: 1000 }
+        submitLabel: { type: string, maxLength: 40 }
+    CampaignForm:
+      type: object
+      required: [id, public_id, title, description, submit_label, template_id]
+      properties:
+        id: { type: string, format: uuid }
+        public_id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        submit_label: { type: string }
+        template_id: { type: string, format: uuid }
+    Campaign:
+      type: object
+      required: [id, name, created_at, campaign_forms]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        created_at: { type: string, format: date-time }
+        campaign_forms: { type: array, items: { $ref: '#/components/schemas/CampaignForm' } }
+    CampaignCreated:
+      allOf:
+        - $ref: '#/components/schemas/Campaign'
+        - type: object
+          required: [publicPath]
+          properties: { publicPath: { type: string, example: /f/abc123 } }
+    DistributionLink:
+      type: object
+      required: [id, channel, token]
+      properties:
+        id: { type: string, format: uuid }
+        channel: { type: string, enum: [instagram, x, youtube, threads] }
+        token: { type: string }
+    PublicForm:
+      type: object
+      required: [form_id, campaign_id, title, description, submit_label, input_schema]
+      properties:
+        form_id: { type: string, format: uuid }
+        campaign_id: { type: string, format: uuid }
+        title: { type: string }
+        description: { type: string }
+        submit_label: { type: string }
+        input_schema: { type: array, items: { $ref: '#/components/schemas/FormField' } }
+    Visit:
+      type: object
+      required: [visit_id, created_at]
+      properties:
+        visit_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+        replayed: { type: boolean }
+    SubmissionResult:
+      type: object
+      required: [submission_id, created_at, replayed]
+      properties:
+        submission_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+        replayed: { type: boolean }
+    Submission:
+      type: object
+      required: [submission_id, created_at, values]
+      properties:
+        submission_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+        channel: { type: [string, 'null'] }
+        values: { type: object, additionalProperties: true }
+    Metric:
+      type: object
+      required: [channel, visits, visitors, submissions, converted_visitors, conversion_rate]
+      properties:
+        channel: { type: string }
+        visits: { type: integer, minimum: 0 }
+        visitors: { type: integer, minimum: 0 }
+        submissions: { type: integer, minimum: 0 }
+        converted_visitors: { type: integer, minimum: 0 }
+        conversion_rate: { type: number, minimum: 0 }
+  responses:
+    Links:
+      description: 채널별 링크
+      content: { application/json: { schema: { type: object, required: [links], properties: { links: { type: array, items: { $ref: '#/components/schemas/DistributionLink' } } } } } }
+    ValidationError: { description: 입력값 오류, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    InvalidCredentials: { description: 인증 정보 불일치, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    Unauthenticated: { description: 로그인 필요, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    NotFound: { description: 소유하거나 공개된 리소스 없음, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    DatabaseError: { description: 데이터 처리 실패, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    NotConfigured: { description: 서버 환경변수 미설정, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    HtmlTooLarge: { description: HTML 256KB 초과, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
