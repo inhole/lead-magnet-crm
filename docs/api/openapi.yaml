@@ -143,6 +143,19 @@ paths:
                   fields: { type: array, items: { $ref: '#/components/schemas/FormField' } }
         '400': { $ref: '#/components/responses/ValidationError' }
         '413': { $ref: '#/components/responses/HtmlTooLarge' }
+  /api/templates/{id}/preview:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      tags: [템플릿]
+      summary: 소유 HTML 템플릿 격리 미리보기
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200': { description: 템플릿 메타데이터와 격리 미리보기 HTML, content: { application/json: { schema: { type: object, required: [template, preview], properties: { template: { $ref: '#/components/schemas/Template' }, preview: { type: string } } } } } }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/DatabaseError' }
+        '503': { $ref: '#/components/responses/NotConfigured' }
   /api/templates/sample:
     get:
       tags: [템플릿]
@@ -396,7 +409,7 @@ components:
         token: { type: string }
     PublicForm:
       type: object
-      required: [form_id, campaign_id, title, description, submit_label, input_schema]
+      required: [form_id, campaign_id, title, description, submit_label, input_schema, html, bridge_token]
       properties:
         form_id: { type: string, format: uuid }
         campaign_id: { type: string, format: uuid }
@@ -404,6 +417,8 @@ components:
         description: { type: string }
         submit_label: { type: string }
         input_schema: { type: array, items: { $ref: '#/components/schemas/FormField' } }
+        html: { type: string, description: 커스텀 문구와 시스템 제출 브리지가 적용된 sandbox용 HTML }
+        bridge_token: { type: string, format: uuid }
     Visit:
       type: object
       required: [visit_id, created_at]

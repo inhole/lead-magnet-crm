@@ -92,3 +92,12 @@
 - 2차 QA: 전체 성과를 `/performance`로 분리하고 GNB의 임시 가로 스크롤을 제거했으며, 캠페인의 공개/미공개 상태와 공개 폼·방문·신청 차단 경계를 추가
 - 원격 DB 진단: `202609090001` 미적용으로 전체 성과·채널 링크 RPC가 없어 운영 환경에서 `DATABASE_ERROR`가 발생함을 migration list로 확인
 - 적용 대기: 원격 dry-run에서 `202609090001_post_p10_qa.sql`, `202609090002_campaign_publication.sql` 두 건만 적용 대상으로 확인
+
+## P03/P04 후속 — HTML 템플릿 기반 커스텀 폼
+
+- 상태: 로컬 구현 및 전체 검증 완료
+- 이슈: #24
+- 변경: `/templates` 소유 템플릿 목록·상세, 템플릿 미리보기 API, 캠페인 Select 이름 표시, HTML 등록 단계의 문구 커스텀 미리보기, 업로드 HTML 기반 공개 신청 폼
+- UX: 캠페인 등록 CTA를 캠페인 목록으로 이동하고, 공개 iframe의 테두리·외부 여백을 제거했으며 콘텐츠 높이를 메시지로 동기화해 내부 스크롤을 없앰
+- 격리: 저장 HTML 재검증, sandbox iframe, CSP `form-action 'none'`, iframe window와 일회성 토큰을 함께 확인하는 시스템 제출 브리지
+- 검증: lint, typecheck, 단위 테스트 34건, 실제 Supabase 통합 테스트 6건, 데스크톱·모바일 E2E 10건, 프로덕션 build 통과

@@ -1,6 +1,6 @@
 "use client"
 
-import { BarChart3Icon, BookOpenIcon, FileCode2Icon, LogOutIcon, MegaphoneIcon, PlusIcon } from "lucide-react"
+import { BarChart3Icon, BookOpenIcon, FileCode2Icon, LogOutIcon, MegaphoneIcon } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -48,7 +48,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Link href="/performance" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full sm:w-auto", pathname === "/performance" && "bg-muted")}>
               <BarChart3Icon data-icon="inline-start" />성과
             </Link>
-            <Link href="/templates/new" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full sm:w-auto", pathname.startsWith("/templates") && "bg-muted")}>
+            <Link href="/templates" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full sm:w-auto", pathname.startsWith("/templates") && "bg-muted")}>
               <FileCode2Icon data-icon="inline-start" />템플릿
             </Link>
             <Link href="/api-docs" target="_blank" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full sm:w-auto")}>
@@ -59,9 +59,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Button type="button" variant="ghost" size="sm" onClick={logout} disabled={pending}>
             <LogOutIcon data-icon="inline-start" />{pending ? "로그아웃 중" : "로그아웃"}
           </Button>
-          <Link href="/campaigns/new" className={buttonVariants({ size: "sm" })}>
-            <PlusIcon data-icon="inline-start" />새 캠페인
-          </Link>
         </div>
       </header>
       {children}

@@ -6,6 +6,7 @@ import type {
   HtmlValidationError,
   HtmlValidationResult,
 } from "@/lib/forms/types"
+import { buildTemplatePreview } from "@/lib/forms/render-template"
 
 type Node = DefaultTreeAdapterMap["node"]
 type Element = DefaultTreeAdapterMap["element"]
@@ -165,7 +166,5 @@ export function validateFormHtml(html: string): HtmlValidationResult {
 }
 
 export function buildSandboxPreview(html: string) {
-  const csp = "default-src 'none'; style-src 'unsafe-inline'; img-src data:; form-action 'none'; base-uri 'none'"
-  const securityHead = `<meta http-equiv="Content-Security-Policy" content="${csp}"><meta charset="utf-8"><style>body{margin:0;padding:24px;font-family:system-ui,sans-serif}form{max-width:560px;margin:auto}</style>`
-  return serialize(parse(html)).replace("<head>", `<head>${securityHead}`)
+  return buildTemplatePreview(html)
 }

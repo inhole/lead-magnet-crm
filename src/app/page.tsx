@@ -27,7 +27,7 @@ export default function Home() {
               <CardDescription>HTML 템플릿을 등록하고 나만의 신청 폼을 만들어 보세요.</CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href="/templates/new" className={buttonVariants({ variant: "secondary" })}>템플릿 등록하기</Link>
+              <Link href="/campaigns/new" className={buttonVariants({ variant: "secondary" })}>캠페인 등록</Link>
             </CardContent>
           </Card>
         </aside>
