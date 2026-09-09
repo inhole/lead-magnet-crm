@@ -3,6 +3,7 @@ import { defaultTreeAdapter, parse, serialize, type DefaultTreeAdapterMap } from
 import type {
   FormFieldSchema,
   FormFieldType,
+  FormOption,
   HtmlValidationError,
   HtmlValidationResult,
 } from "@/lib/forms/types"
@@ -50,6 +51,52 @@ function wrappingLabel(element: Element) {
   return undefined
 }
 
+function isDescendant(ancestor: Element, node: Node): boolean {
+  let current: Node | null = node
+  while (current) {
+    if (current === ancestor) return true
+    current = defaultTreeAdapter.getParentNode(current)
+  }
+  return false
+}
+
+function findGroupWrapper(groupElements: Element[]): Element | null {
+  let candidate = defaultTreeAdapter.getParentNode(groupElements[0])
+  while (candidate) {
+    if (defaultTreeAdapter.isElementNode(candidate) && candidate.tagName === "div" && groupElements.every((element) => isDescendant(candidate as Element, element))) {
+      return candidate
+    }
+    candidate = defaultTreeAdapter.getParentNode(candidate)
+  }
+  return null
+}
+
+function groupLeadingText(wrapper: Element, groupElements: Element[]): string | undefined {
+  for (const child of wrapper.childNodes) {
+    if (defaultTreeAdapter.isTextNode(child)) {
+      const text = child.value.trim()
+      if (text) return text
+      continue
+    }
+    if (!defaultTreeAdapter.isElementNode(child)) continue
+    if (groupElements.some((element) => isDescendant(child, element))) return undefined
+    const text = textContent(child)
+    if (text) return text
+  }
+  return undefined
+}
+
+function groupLabel(groupElements: Element[], name: string): string {
+  const wrapper = findGroupWrapper(groupElements)
+  if (!wrapper) return name
+  return attribute(wrapper, "data-form-group-label") || groupLeadingText(wrapper, groupElements) || name
+}
+
+function optionLabel(element: Element, labels: Map<string, string>) {
+  const id = attribute(element, "id")
+  return (id && labels.get(id)) || wrappingLabel(element) || attribute(element, "aria-label") || attribute(element, "value") || ""
+}
+
 function walk(node: Node, visit: (element: Element) => void) {
   if (defaultTreeAdapter.isElementNode(node)) visit(node)
   children(node).forEach((child) => walk(child, visit))
@@ -63,12 +110,12 @@ function fieldType(element: Element): FormFieldType | null {
   return supportedInputTypes.has(type) ? type : null
 }
 
-function optionValues(element: Element) {
+function optionValues(element: Element): FormOption[] {
   return element.childNodes
     .filter(defaultTreeAdapter.isElementNode)
     .filter((child) => child.tagName === "option")
-    .map((option) => attribute(option, "value") || textContent(option))
-    .filter(Boolean)
+    .map((option) => ({ value: attribute(option, "value") || textContent(option), label: textContent(option) || attribute(option, "value") || "" }))
+    .filter((option) => option.value)
 }
 
 export function validateFormHtml(html: string): HtmlValidationResult {
@@ -146,20 +193,24 @@ export function validateFormHtml(html: string): HtmlValidationResult {
 
   const grouped = Map.groupBy(fields, (field) => field.name)
   for (const [name, sameNameFields] of grouped) {
-    if (sameNameFields.length > 1 && !sameNameFields.every((field) => field.type === "radio")) {
-      errors.push({ code: "DUPLICATE_NAME", message: `${name} name은 라디오 그룹 외에는 중복 사용할 수 없습니다.` })
+    const isGroupable = sameNameFields.every((field) => field.type === "radio") || sameNameFields.every((field) => field.type === "checkbox")
+    if (sameNameFields.length > 1 && !isGroupable) {
+      errors.push({ code: "DUPLICATE_NAME", message: `${name} name은 라디오·체크박스 그룹 외에는 중복 사용할 수 없습니다.` })
     }
   }
   if (fields.length === 0) errors.push({ code: "NO_FIELDS", message: "지원되는 입력 항목이 하나 이상 필요합니다." })
 
   if (errors.length) return { ok: false, errors: [...new Map(errors.map((error) => [`${error.code}:${error.message}`, error])).values()] }
   const normalizedFields = [...grouped.values()].map((sameNameFields) => {
-    if (!sameNameFields.every((field) => field.type === "radio")) return sameNameFields[0]
-    const radioElements = elements.filter((element) => element.tagName === "input" && attribute(element, "name") === sameNameFields[0].name)
+    const groupType = sameNameFields[0].type
+    const isGroup = sameNameFields.length > 1 && (groupType === "radio" || groupType === "checkbox")
+    if (!isGroup) return sameNameFields[0]
+    const groupElements = elements.filter((element) => element.tagName === "input" && (attribute(element, "type") || "text").toLowerCase() === groupType && attribute(element, "name") === sameNameFields[0].name)
     return {
       ...sameNameFields[0],
+      label: groupLabel(groupElements, sameNameFields[0].name),
       required: sameNameFields.some((field) => field.required),
-      options: radioElements.map((element) => attribute(element, "value") || "").filter(Boolean),
+      options: groupElements.map((element) => ({ value: attribute(element, "value") || "", label: optionLabel(element, labels) })).filter((option) => option.value),
     }
   })
   return { ok: true, html: serialize(document), fields: normalizedFields }

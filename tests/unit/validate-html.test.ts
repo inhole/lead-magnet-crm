@@ -22,8 +22,63 @@ describe("validateFormHtml", () => {
     if (!result.ok) return
     expect(result.fields).toEqual([
       { name: "email", label: "이메일", type: "email", required: true },
-      { name: "interest", label: "영업", type: "radio", required: false, options: ["sales", "marketing"] },
+      { name: "interest", label: "interest", type: "radio", required: false, options: [{ value: "sales", label: "영업" }, { value: "marketing", label: "마케팅" }] },
     ])
+  })
+
+  it("data-form-group-label로 감싼 라디오 그룹의 제목을 읽는다", () => {
+    const html = validHtml.replace(
+      /<label><input name="interest"[\s\S]*마케팅<\/label>/,
+      `<div data-form-group-label="관심 분야">
+        <label><input name="interest" type="radio" value="sales" required> 영업</label>
+        <label><input name="interest" type="radio" value="marketing"> 마케팅</label>
+      </div>`,
+    )
+    const result = validateFormHtml(html)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    const interest = result.fields.find((field) => field.name === "interest")
+    expect(interest).toEqual({ name: "interest", label: "관심 분야", type: "radio", required: true, options: [{ value: "sales", label: "영업" }, { value: "marketing", label: "마케팅" }] })
+  })
+
+  it("속성이 없으면 래퍼 안 첫 텍스트를 그룹 제목으로 쓴다", () => {
+    const html = validHtml.replace(
+      /<label><input name="interest"[\s\S]*마케팅<\/label>/,
+      `<div>
+        <span>관심 분야</span>
+        <label><input name="interest" type="radio" value="sales"> 영업</label>
+        <label><input name="interest" type="radio" value="marketing"> 마케팅</label>
+      </div>`,
+    )
+    const result = validateFormHtml(html)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.fields.find((field) => field.name === "interest")?.label).toBe("관심 분야")
+  })
+
+  it("같은 name의 체크박스 그룹을 허용하고 선택지 라벨을 함께 담는다", () => {
+    const html = validHtml.replace(
+      /<label><input name="interest"[\s\S]*마케팅<\/label>/,
+      `<div data-form-group-label="수신 채널">
+        <label><input name="channels" type="checkbox" value="email"> 이메일</label>
+        <label><input name="channels" type="checkbox" value="sms"> 문자</label>
+      </div>`,
+    )
+    const result = validateFormHtml(html)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.fields.find((field) => field.name === "channels")).toEqual({ name: "channels", label: "수신 채널", type: "checkbox", required: false, options: [{ value: "email", label: "이메일" }, { value: "sms", label: "문자" }] })
+  })
+
+  it("셀렉트의 선택지 텍스트를 라벨로 보존한다", () => {
+    const html = validHtml.replace(
+      "</form>",
+      `<label for="role">직무</label><select id="role" name="role"><option value="marketing">마케팅</option></select></form>`,
+    )
+    const result = validateFormHtml(html)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.fields.find((field) => field.name === "role")?.options).toEqual([{ value: "marketing", label: "마케팅" }])
   })
 
   it.each([

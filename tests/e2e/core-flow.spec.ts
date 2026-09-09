@@ -8,3 +8,62 @@ test("캠페인 공개와 미공개 상태를 전환한다", async ({ page }) =>
 
 test("관리자 GNB에서 로그아웃한다", async ({ page }) => { await page.goto("/login"); await page.getByLabel("이메일").fill(operator.email); await page.getByLabel("비밀번호").fill(operator.password); await page.getByRole("button", { name: "로그인" }).click(); await page.getByRole("button", { name: "로그아웃" }).click(); await expect(page).toHaveURL("/login") })
 test("격리 미리보기는 원본 문구를 표시하고 상위 DOM에 접근하지 못한다", async ({ page }) => { await page.goto("/login"); await page.getByLabel("이메일").fill(operator.email); await page.getByLabel("비밀번호").fill(operator.password); await page.getByRole("button", { name: "로그인" }).click(); await expect(page).toHaveURL("/"); await page.goto("/templates/new"); await page.getByLabel("템플릿 이름").fill("격리 확인"); await page.getByLabel("HTML 파일").setInputFiles({ name: "isolation.html", mimeType: "text/html", buffer: Buffer.from('<main><h1 data-form-title>자료 신청</h1><p data-form-description>이메일을 입력하세요.</p><form><label for="email">이메일</label><input id="email" name="email" type="email" required><button data-form-submit type="submit">보내기</button></form></main>') }); const frame = page.frameLocator('iframe[title="등록할 HTML 템플릿 미리보기"]'); await expect(page.getByLabel("미리보기 제목")).toHaveCount(0); await expect(frame.getByRole("heading", { name: "자료 신청" })).toBeVisible(); await expect(frame.getByRole("button", { name: "보내기" })).toBeVisible(); expect(await frame.locator("body").evaluate(() => { try { void window.parent.document.body; return false } catch { return true } })).toBe(true) })
+
+test("라디오·체크박스 그룹 제목과 셀렉트 선택지 라벨이 신청 상세에 표시된다", async ({ page }, testInfo) => {
+  const suffix = testInfo.project.name
+  const templateName = `그룹 필드 템플릿 ${suffix}`
+  const formTitle = `그룹 필드 신청 ${suffix}`
+
+  await page.goto("/login")
+  await page.getByLabel("이메일").fill(operator.email)
+  await page.getByLabel("비밀번호").fill(operator.password)
+  await page.getByRole("button", { name: "로그인" }).click()
+  await expect(page).toHaveURL("/")
+
+  const html = `<main><h1 data-form-title>${formTitle}</h1><p data-form-description>안내</p><form>
+    <label for="email">이메일</label><input id="email" name="email" type="email" required>
+    <label for="role">직무</label><select id="role" name="role" required><option value="marketing">마케팅</option><option value="sales">영업</option></select>
+    <div data-form-group-label="관심 분야"><label><input name="interest" type="radio" value="report" required> 리포트</label><label><input name="interest" type="radio" value="webinar"> 웨비나</label></div>
+    <div data-form-group-label="수신 채널"><label><input name="channels" type="checkbox" value="newsletter"> 뉴스레터</label><label><input name="channels" type="checkbox" value="sms"> 문자</label></div>
+    <button data-form-submit type="submit">신청하기</button>
+  </form></main>`
+  await page.goto("/templates/new")
+  await page.getByLabel("템플릿 이름").fill(templateName)
+  await page.getByLabel("HTML 파일").setInputFiles({ name: "group-fields.html", mimeType: "text/html", buffer: Buffer.from(html) })
+  await expect(page.getByText("검증을 통과했습니다")).toBeVisible()
+  await page.getByRole("button", { name: "템플릿 등록" }).click()
+  await expect(page.getByText("템플릿을 등록했습니다")).toBeVisible()
+
+  await page.goto("/campaigns/new")
+  await page.getByRole("combobox", { name: "HTML 템플릿" }).click()
+  await page.getByRole("option", { name: templateName, exact: true }).click()
+  await expect(page.getByLabel("공개 폼 제목")).toHaveValue(formTitle)
+  await page.getByLabel("캠페인 이름").fill(`그룹 필드 캠페인 ${suffix}`)
+  await page.getByRole("button", { name: "캠페인 만들기" }).click()
+  await expect(page).toHaveURL(/\/campaigns\/[0-9a-f-]+$/)
+  await page.getByRole("button", { name: "캠페인 공개하기" }).click()
+  await expect(page.getByRole("link", { name: "직접 유입 폼 열기" })).toBeVisible()
+
+  const publicFormPagePromise = page.waitForEvent("popup")
+  await page.getByRole("link", { name: "직접 유입 폼 열기" }).click()
+  const publicFormPage = await publicFormPagePromise
+  const form = publicFormPage.frameLocator(`iframe[title="${formTitle}"]`)
+  await expect(form.getByRole("heading", { name: formTitle })).toBeVisible()
+  await form.getByLabel("이메일").fill("group-fields@example.com")
+  await form.getByLabel("직무").selectOption("marketing")
+  await form.getByLabel("리포트").check()
+  await form.getByLabel("문자").check()
+  await form.getByRole("button", { name: "신청하기" }).click()
+  await expect(publicFormPage.getByText("신청이 완료되었습니다")).toBeVisible()
+  await publicFormPage.close()
+
+  await page.reload()
+  await page.getByRole("button", { name: "입력값 보기" }).first().click()
+  const dialog = page.getByRole("dialog")
+  await expect(dialog.getByText("직무", { exact: true })).toBeVisible()
+  await expect(dialog.getByText("마케팅", { exact: true })).toBeVisible()
+  await expect(dialog.getByText("관심 분야", { exact: true })).toBeVisible()
+  await expect(dialog.getByText("리포트", { exact: true })).toBeVisible()
+  await expect(dialog.getByText("수신 채널", { exact: true })).toBeVisible()
+  await expect(dialog.getByText("문자", { exact: true })).toBeVisible()
+})

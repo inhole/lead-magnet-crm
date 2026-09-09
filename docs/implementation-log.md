@@ -111,3 +111,13 @@
 - 경계: GET은 더 이상 데이터를 쓰지 않으며 누락 복구는 POST의 `ensure_campaign_links`가 담당함. 소유자가 아닌 운영자는 `P0002`로 차단됨
 - 검증: lint, typecheck, 단위 테스트 35건, 새 로컬 DB 초기화 후 통합 테스트 7건, 데스크톱·모바일 E2E 10건, 프로덕션 build 통과
 - 참고: 채널 성과 표가 항상 다섯 채널을 표시하므로 E2E는 채널명 대신 링크 복사 버튼 수로 배포 링크를 확인함
+
+## 개선 B — 신청 입력값 선택지 라벨 표시
+
+- 상태: 로컬 구현 및 전체 검증 완료
+- 이슈: #30
+- 원인: 라디오 그룹 라벨이 첫 선택지의 라벨을 그대로 썼고, 셀렉트는 사람이 읽는 텍스트 없이 원시 `value`만 저장했으며, 체크박스는 같은 name을 등록 단계에서 거부해 그룹 자체를 만들 수 없었다
+- 변경: `validateFormHtml`이 라디오·체크박스를 감싼 `div`의 `data-form-group-label`(없으면 그룹 앞 첫 텍스트, 그것도 없으면 name)로 그룹 제목을 정하고 각 선택지·셀렉트 옵션에 `{ value, label }`을 함께 담도록 함. 같은 name의 체크박스 그룹 등록을 허용함. `validateSubmissionValues`가 체크박스 그룹 값을 옵션 목록과 비교해 검증함. 표시 로직을 `src/lib/submissions/display.ts`로 분리해 값을 라벨로 매핑함
+- 호환: 문자열 배열 `options`를 읽어 `{ value, label }`로 바꾸는 `normalizeFormFields`를 두고, 기존 `html_templates.input_schema`를 새 형태로 옮기는 마이그레이션(`202609090004_option_labels.sql`)을 추가함
+- 문서: `docs/html-template-rules.md`에 그룹 제목 규칙과 예시, `src/lib/forms/ai-prompt.ts`와 `samples/lead-form.html`에 라디오·체크박스 그룹 예시, `docs/api/openapi.yaml`의 `FormField.options` 스키마를 갱신함
+- 검증: lint, typecheck, 단위 테스트 48건, 새 로컬 DB 초기화 후 통합 테스트 8건(레거시 옵션 형태의 마이그레이션 SQL은 롤백 트랜잭션으로 별도 재현), 데스크톱·모바일 E2E 12건, 프로덕션 build 통과

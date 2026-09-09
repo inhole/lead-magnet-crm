@@ -6,7 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
 
-type FormField = { name: string; label: string; type: string; required: boolean; options?: string[] }
+type FormField = { name: string; label: string; type: string; required: boolean; options?: Array<{ value: string; label: string }> }
 type PublicFormData = {
   title: string
   description: string

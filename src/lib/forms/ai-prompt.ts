@@ -5,7 +5,8 @@ export const HTML_TEMPLATE_AI_PROMPT = `리드 수집용 단일 HTML 신청 폼�
 - 제목에는 data-form-title, 설명에는 data-form-description, 제출 버튼에는 data-form-submit 속성을 넣는다.
 - 모든 input, textarea, select에는 고유한 name과 연결된 label을 둔다.
 - 지원 입력 타입은 text, email, tel, number, checkbox, radio이며 필요한 항목은 required로 표시한다. textarea와 select도 사용할 수 있다.
-- meta, fieldset, legend 요소는 사용하지 않는다. 선택 항목을 묶을 때는 div와 label을 사용한다.
+- select의 option은 value 속성과 사람이 읽는 텍스트를 함께 넣는다.
+- meta, fieldset, legend 요소는 사용하지 않는다. 선택 항목을 묶을 때는 div와 label을 사용한다. 같은 name의 라디오·체크박스 그룹은 전체를 감싼 div에 data-form-group-label 속성으로 그룹 제목을 넣는다.
 - script, iframe, 외부 URL, 외부 CSS/폰트, 이벤트 핸들러(onclick 등)는 사용하지 않는다.
 - 개인정보는 최소한으로 요청하고 모바일에서도 읽기 쉽게 작성한다.
 
