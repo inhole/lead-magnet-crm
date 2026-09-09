@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 
+import { extractFormCopy } from "@/lib/forms/render-template"
 import { buildSandboxPreview, validateFormHtml } from "@/lib/forms/validate-html"
 
 export async function POST(request: Request) {
@@ -16,5 +17,5 @@ export async function POST(request: Request) {
   if (!result.ok) {
     return NextResponse.json({ code: "INVALID_HTML", message: "HTML 작성 규칙을 확인하세요.", errors: result.errors }, { status: 400 })
   }
-  return NextResponse.json({ html: result.html, preview: buildSandboxPreview(result.html), fields: result.fields })
+  return NextResponse.json({ html: result.html, preview: buildSandboxPreview(result.html), fields: result.fields, defaults: extractFormCopy(result.html) })
 }

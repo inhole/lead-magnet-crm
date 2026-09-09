@@ -121,3 +121,12 @@
 - 호환: 문자열 배열 `options`를 읽어 `{ value, label }`로 바꾸는 `normalizeFormFields`를 두고, 기존 `html_templates.input_schema`를 새 형태로 옮기는 마이그레이션(`202609090004_option_labels.sql`)을 추가함
 - 문서: `docs/html-template-rules.md`에 그룹 제목 규칙과 예시, `src/lib/forms/ai-prompt.ts`와 `samples/lead-form.html`에 라디오·체크박스 그룹 예시, `docs/api/openapi.yaml`의 `FormField.options` 스키마를 갱신함
 - 검증: lint, typecheck, 단위 테스트 48건, 새 로컬 DB 초기화 후 통합 테스트 8건(레거시 옵션 형태의 마이그레이션 SQL은 롤백 트랜잭션으로 별도 재현), 데스크톱·모바일 E2E 12건, 프로덕션 build 통과
+
+## 개선 C — 템플릿 문구 기본값 전달
+
+- 상태: 로컬 구현 및 전체 검증 완료
+- 이슈: #32
+- 원인: 템플릿 등록·상세 화면에 제목·안내 문구·제출 버튼 문구가 전혀 표시되지 않았고, 캠페인 생성 화면은 템플릿을 선택할 때마다 `/api/templates/[id]/preview` 응답을 기다려야 문구가 채워졌으며 그 값으로 무조건 덮어써 입력 중이던 문구가 사라졌다
+- 변경: `html_templates`에 `default_title`/`default_description`/`default_submit_label` 컬럼을 추가하고 등록 시 `extractFormCopy`로 채움. 목록·상세·검증 API 응답에 문구를 포함해 캠페인 생성 화면이 목록 응답만으로 즉시 채울 수 있게 함. `applyTemplateDefaults`로 사용자가 직접 고친 필드는 템플릿을 바꿔도 유지되도록 함. 등록 화면과 템플릿 상세에 문구를 표시함
+- 백필: 기존 템플릿의 Storage HTML을 다시 파싱해 문구 컬럼을 채우는 `scripts/backfill-template-copy-defaults.mjs`(`npm run backfill:template-copy`)를 추가하고, 레거시 형태 템플릿에 대해 로컬 Supabase에서 직접 실행해 컬럼이 정확히 채워짐을 확인함
+- 검증: lint, typecheck, 단위 테스트 52건, 새 로컬 DB 초기화 후 통합 테스트 8건, 데스크톱·모바일 E2E 14건(템플릿 선택 시 즉시 채움과 문구 수정 후 다른 템플릿 선택 시 유지 확인 포함), 프로덕션 build 통과

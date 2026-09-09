@@ -10,6 +10,11 @@ describe("HTML 템플릿 렌더링", () => {
     expect(extractFormCopy(html)).toEqual({ title: "기존 제목", description: "기존 설명", submitLabel: "기존 버튼" })
   })
 
+  it("마커가 없으면 빈 문자열로 처리한다", () => {
+    const withoutMarkers = `<main><form><label for="email">이메일</label><input id="email" name="email" type="email"></form></main>`
+    expect(extractFormCopy(withoutMarkers)).toEqual({ title: "", description: "", submitLabel: "" })
+  })
+
   it("마커의 문구를 텍스트로 안전하게 교체한다", () => {
     const result = customizeFormHtml(html, copy)
     expect(result).toContain("새 &lt;제목&gt;")
