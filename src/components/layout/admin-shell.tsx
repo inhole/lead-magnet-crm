@@ -48,7 +48,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Link href="/performance" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full sm:w-auto", pathname === "/performance" && "bg-muted")}>
               <BarChart3Icon data-icon="inline-start" />성과
             </Link>
-            <Link href="/templates/new" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full sm:w-auto", pathname.startsWith("/templates") && "bg-muted")}>
+            <Link href="/templates" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full sm:w-auto", pathname.startsWith("/templates") && "bg-muted")}>
               <FileCode2Icon data-icon="inline-start" />템플릿
             </Link>
             <Link href="/api-docs" target="_blank" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "w-full sm:w-auto")}>

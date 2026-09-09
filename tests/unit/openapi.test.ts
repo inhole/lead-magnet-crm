@@ -13,6 +13,7 @@ const expectedOperations: Record<string, string[]> = {
   "/api/auth/logout": ["post"],
   "/api/auth/me": ["get"],
   "/api/templates": ["get", "post"],
+  "/api/templates/{id}/preview": ["get"],
   "/api/templates/validate": ["post"],
   "/api/templates/sample": ["get"],
   "/api/campaigns": ["get", "post"],
@@ -66,7 +67,7 @@ describe("OpenAPI 계약", () => {
         if (!["/api/auth/logout", "/api/auth/me", "/api/templates/sample"].includes(route)) {
           expect(Object.keys(operation?.responses ?? {}).some((status) => status.startsWith("4") || status.startsWith("5")), `${method.toUpperCase()} ${route} 실패 응답`).toBe(true)
         }
-        if (route === "/api/metrics" || route === "/api/templates" || route.startsWith("/api/campaigns")) expect(operation?.security, `${method.toUpperCase()} ${route} 인증`).toEqual([{ cookieAuth: [] }])
+        if (route === "/api/metrics" || (route.startsWith("/api/templates") && route !== "/api/templates/sample" && route !== "/api/templates/validate") || route.startsWith("/api/campaigns")) expect(operation?.security, `${method.toUpperCase()} ${route} 인증`).toEqual([{ cookieAuth: [] }])
       }
     }
   })
