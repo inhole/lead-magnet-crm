@@ -3,7 +3,7 @@ import { defaultTreeAdapter, parse, serialize, type DefaultTreeAdapterMap } from
 type Node = DefaultTreeAdapterMap["node"]
 type Element = DefaultTreeAdapterMap["element"]
 
-type FormCopy = {
+export type FormCopy = {
   title: string
   description: string
   submitLabel: string
@@ -22,6 +22,22 @@ function walk(node: Node, visit: (element: Element) => void) {
 
 function hasAttribute(element: Element, name: string) {
   return element.attrs.some((attribute) => attribute.name.toLowerCase() === name)
+}
+
+function textContent(node: Node): string {
+  if (defaultTreeAdapter.isTextNode(node)) return node.value
+  return children(node).map(textContent).join(" ").replace(/\s+/g, " ").trim()
+}
+
+export function extractFormCopy(html: string): FormCopy {
+  const document = parse(html)
+  const copy: FormCopy = { title: "", description: "", submitLabel: "" }
+  walk(document, (element) => {
+    if (hasAttribute(element, "data-form-title")) copy.title = textContent(element)
+    if (hasAttribute(element, "data-form-description")) copy.description = textContent(element)
+    if (hasAttribute(element, "data-form-submit")) copy.submitLabel = textContent(element)
+  })
+  return copy
 }
 
 function replaceText(element: Element, value: string) {

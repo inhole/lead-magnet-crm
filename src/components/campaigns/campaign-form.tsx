@@ -50,7 +50,17 @@ export function CampaignForm() {
     if (!templateId) return
     const controller = new AbortController()
     fetch(`/api/templates/${templateId}/preview`, { signal: controller.signal })
-      .then(async (response) => { const body = await response.json(); if (!response.ok) throw new Error(body.message); setTemplatePreview(body.preview) })
+      .then(async (response) => {
+        const body = await response.json()
+        if (!response.ok) throw new Error(body.message)
+        setTemplatePreview(body.preview)
+        setValues((current) => ({
+          ...current,
+          title: body.defaults?.title ?? "",
+          description: body.defaults?.description ?? "",
+          submitLabel: body.defaults?.submitLabel || "신청하기",
+        }))
+      })
       .catch((reason) => { if (reason instanceof DOMException && reason.name === "AbortError") return; setPreviewError(reason instanceof Error ? reason.message : "템플릿 미리보기를 불러오지 못했습니다.") })
       .finally(() => { if (!controller.signal.aborted) setPreviewLoading(false) })
     return () => controller.abort()

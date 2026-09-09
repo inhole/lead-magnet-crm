@@ -46,7 +46,7 @@ export function TemplateList() {
 
   return (
     <div className="overflow-hidden rounded-2xl border bg-card/55">
-      <Table>
+      <Table className="[&_td]:py-4 [&_td:first-child]:pl-6 [&_td:last-child]:pr-6 [&_th:first-child]:pl-6 [&_th:last-child]:pr-6">
         <TableHeader><TableRow><TableHead>템플릿 이름</TableHead><TableHead>입력 항목</TableHead><TableHead className="text-right">등록일</TableHead></TableRow></TableHeader>
         <TableBody>{templates.map((template) => <TableRow key={template.id}><TableCell className="font-medium"><Link href={`/templates/${template.id}`} className="underline-offset-4 hover:underline">{template.name}</Link></TableCell><TableCell><Badge variant="secondary">{template.input_schema.length}개</Badge></TableCell><TableCell className="text-right"><time dateTime={template.created_at} className="text-sm text-muted-foreground">{koreaTime(template.created_at)}</time></TableCell></TableRow>)}</TableBody>
       </Table>
