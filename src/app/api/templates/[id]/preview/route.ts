@@ -29,5 +29,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     template: { id: template.id, name: template.name, input_schema: template.input_schema, created_at: template.created_at, default_title: template.default_title, default_description: template.default_description, default_submit_label: template.default_submit_label },
     defaults,
     preview: buildTemplatePreview(result.html),
+    html: result.html,
   })
 }

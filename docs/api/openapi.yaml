@@ -152,7 +152,7 @@ paths:
       summary: 소유 HTML 템플릿 격리 미리보기
       security: [{ cookieAuth: [] }]
       responses:
-        '200': { description: 템플릿 메타데이터와 기본 문구 및 격리 미리보기 HTML, content: { application/json: { schema: { type: object, required: [template, defaults, preview], properties: { template: { $ref: '#/components/schemas/Template' }, defaults: { type: object, required: [title, description, submitLabel], properties: { title: { type: string }, description: { type: string }, submitLabel: { type: string } } }, preview: { type: string } } } } } }
+        '200': { description: 템플릿 메타데이터와 기본 문구, 격리 미리보기 HTML, 재사용 가능한 원본 HTML, content: { application/json: { schema: { type: object, required: [template, defaults, preview, html], properties: { template: { $ref: '#/components/schemas/Template' }, defaults: { type: object, required: [title, description, submitLabel], properties: { title: { type: string }, description: { type: string }, submitLabel: { type: string } } }, preview: { type: string }, html: { type: string } } } } } }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '404': { $ref: '#/components/responses/NotFound' }
         '500': { $ref: '#/components/responses/DatabaseError' }
