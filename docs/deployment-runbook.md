@@ -27,7 +27,15 @@ npx supabase migration list --linked
 
 적용 전 `--dry-run` 결과가 `supabase/migrations`의 미적용 파일만 포함하는지 검토한다. 적용 후 로컬과 원격 migration 목록이 같아야 한다. Supabase Authentication에서 검증 전용 운영자 A/B를 만들고 두 계정 모두 이메일 인증 완료 상태로 준비한다.
 
-## 3. Vercel 배포
+## 3. 문구 기본값 백필
+
+`202609090005_template_copy_defaults.sql`을 적용한 프로젝트에는 기존 템플릿의 등록 HTML을 다시 파싱해 문구 컬럼을 채우는 백필을 한 번 실행한다. `NEXT_PUBLIC_SUPABASE_URL`과 `SUPABASE_SERVICE_ROLE_KEY`가 현재 셸에 설정된 상태에서 실행한다. 이 마이그레이션 이후 등록한 템플릿은 등록 시점에 문구가 채워지므로 백필 대상이 아니다.
+
+```bash
+npm run backfill:template-copy
+```
+
+## 4. Vercel 배포
 
 Vercel Production 환경에 아래 값을 설정하고 `main`의 검증 완료 커밋을 배포한다.
 
@@ -43,7 +51,7 @@ npm run test:deployment:smoke -- https://<production-domain>
 
 6건이 모두 통과해야 한다. 이 검사는 로그인, 데이터 생성, 삭제를 수행하지 않는다.
 
-## 4. 전체 성공 흐름
+## 5. 전체 성공 흐름
 
 아래 순서를 실제 브라우저에서 수행하고 생성한 ID와 결과만 기록한다. 비밀번호와 신청 원문은 기록하지 않는다.
 
@@ -56,7 +64,7 @@ npm run test:deployment:smoke -- https://<production-domain>
 7. 운영자 B로 로그인해 운영자 A의 캠페인·신청에 접근할 수 없는지 확인한다.
 8. 기록한 ID에 해당하는 검증 데이터만 정리한다. 정리 전후 건수를 기록한다.
 
-## 5. 완료 근거
+## 6. 완료 근거
 
 - Supabase 원격 migration 목록
 - Vercel 배포 커밋 SHA와 Production URL
