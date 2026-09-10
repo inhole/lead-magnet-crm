@@ -1,6 +1,6 @@
 # 최종 제출 체크리스트
 
-작성 기준일은 2026-09-09이며, 실제 제출 직전에 `main` SHA와 CI 링크를 최종 값으로 갱신한다. 이 문서에는 운영자 비밀번호, Supabase 키, 신청자 원문을 기록하지 않는다.
+작성 기준일은 2026-09-10이며, 실제 제출 직전에 `main` SHA와 CI 링크를 최종 값으로 갱신한다. 이 문서에는 운영자 비밀번호, Supabase 키, 신청자 원문을 기록하지 않는다.
 
 ## 제출 대상
 
@@ -16,13 +16,13 @@
 
 ## 검증 근거
 
-- Supabase 원격 migration: `202609080001`~`202609080005`의 로컬·원격 이력이 일치한다.
+- Supabase 원격 migration: `202609080001`~`202609090005` 10개 파일의 로컬·원격 이력이 일치한다.
 - Supabase dry-run: `npx supabase db push --linked --dry-run` 결과가 `Remote database is up to date.`이다.
 - Production 배포: 기준 SHA의 GitHub Production deployment `6342268166`이 성공했다.
 - 배포 스모크: `npm run test:deployment:smoke -- https://lead-magnet-crm.vercel.app` 6/6건 통과.
 - main CI: [앱 품질 검사](https://github.com/inhole/lead-magnet-crm/actions/runs/34309532509), [CI 결과 집계 도구 검증](https://github.com/inhole/lead-magnet-crm/actions/runs/34309532567).
 
-P10 변경이 병합되면 병합 SHA의 CI와 Production 배포를 다시 확인하고 위 기준 SHA를 교체한다. 이전 SHA의 성공을 최종 제출 근거로 사용하지 않는다.
+새 변경이 `main`에 병합되면 병합 SHA의 필수 CI와 Production 배포를 다시 확인하고 위 기준 SHA를 교체한다. 이전 SHA의 성공을 최종 제출 근거로 사용하지 않는다.
 
 ## 평가자 접근
 
