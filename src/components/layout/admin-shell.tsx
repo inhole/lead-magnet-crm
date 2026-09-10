@@ -27,7 +27,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   async function logout() {
     setPending(true)
-    await fetch("/api/auth/logout", { method: "POST" })
+    try {
+      await fetch("/api/auth/logout", { method: "POST" })
+    } finally {
+      setPending(false)
+    }
     router.replace("/login")
     router.refresh()
   }
