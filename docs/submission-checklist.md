@@ -10,7 +10,7 @@
 | 데모 | https://lead-magnet-crm.vercel.app | 비인증 루트는 `/login`으로 이동 |
 | API 문서 | https://lead-magnet-crm.vercel.app/api-docs | 공개 접근 가능 |
 | OpenAPI 원본 | https://lead-magnet-crm.vercel.app/api/openapi | 공개 접근 가능 |
-| 제출 후보 기준 SHA | `a0c87dc700ffd35059920454cb402bcd3b252323` | PR #17 merge commit |
+| 제출 후보 기준 SHA | `7dbdac67798597cdfa8aacd5b343e21f29aa9690` | PR #42 merge commit. 이후 커밋은 문서 변경뿐이다 |
 
 저장소 공개 상태가 의도된 제출 방식인지 제출 직전에 다시 확인한다. 비공개로 바꾼다면 평가자 GitHub 계정을 collaborator로 초대한 뒤 실제 접근을 확인한다.
 
@@ -18,9 +18,9 @@
 
 - Supabase 원격 migration: `202609080001`~`202609090005` 10개 파일의 로컬·원격 이력이 일치한다.
 - Supabase dry-run: `npx supabase db push --linked --dry-run` 결과가 `Remote database is up to date.`이다.
-- Production 배포: 기준 SHA의 GitHub Production deployment `6342268166`이 성공했다.
+- Production 배포: 기준 SHA의 GitHub Production deployment `6364641144`이 성공했다.
 - 배포 스모크: `npm run test:deployment:smoke -- https://lead-magnet-crm.vercel.app` 6/6건 통과.
-- main CI: [앱 품질 검사](https://github.com/inhole/lead-magnet-crm/actions/runs/34309532509), [CI 결과 집계 도구 검증](https://github.com/inhole/lead-magnet-crm/actions/runs/34309532567).
+- main CI: [앱 품질 검사](https://github.com/inhole/lead-magnet-crm/actions/runs/34437689700), [CI 결과 집계 도구 검증](https://github.com/inhole/lead-magnet-crm/actions/runs/34437689503). 두 워크플로 모두 기준 SHA에서 성공했고 앱 품질 검사는 lint·typecheck·build, 단위 52건, 통합 8건, 데스크톱·모바일 E2E 20건을 포함한다.
 
 새 변경이 `main`에 병합되면 병합 SHA의 필수 CI와 Production 배포를 다시 확인하고 위 기준 SHA를 교체한다. 이전 SHA의 성공을 최종 제출 근거로 사용하지 않는다.
 
