@@ -1,13 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
-import { CopyIcon } from "lucide-react"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { buttonVariants } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
 
 type Template = {
@@ -41,5 +38,5 @@ export function TemplateDetail({ templateId }: { templateId: string }) {
       <div><dt className="inline text-muted-foreground">제출 버튼: </dt><dd className="inline">{template.default_submit_label || "지정 안 됨"}</dd></div>
     </dl>
     <div className="flex flex-col gap-3 border-t pt-3">{template.input_schema.map((field) => <div key={field.name} className="flex items-center justify-between gap-3 text-sm"><span className="truncate font-medium">{field.label}</span><Badge variant="secondary">{field.type}{field.required ? " · 필수" : ""}</Badge></div>)}</div>
-  </CardContent><CardFooter><Link href={`/templates/new?duplicateFrom=${template.id}`} className={buttonVariants({ variant: "outline" })}><CopyIcon data-icon="inline-start" />복제해 새 템플릿 만들기</Link></CardFooter></Card><Card><CardHeader><CardTitle>폼 미리보기</CardTitle><CardDescription>등록된 HTML을 실행 권한 없는 sandbox에서 표시합니다. 이미 등록된 템플릿은 수정할 수 없고 기존 캠페인에 영향을 주지 않도록 복제로만 바꿀 수 있습니다.</CardDescription></CardHeader><CardContent><iframe title={`${template.name} 미리보기`} sandbox="" srcDoc={preview} className="min-h-[680px] w-full border-0 bg-white" /></CardContent></Card></div>
+  </CardContent></Card><Card><CardHeader><CardTitle>폼 미리보기</CardTitle><CardDescription>등록된 HTML을 실행 권한 없는 sandbox에서 표시합니다.</CardDescription></CardHeader><CardContent><iframe title={`${template.name} 미리보기`} sandbox="" srcDoc={preview} className="min-h-[680px] w-full border-0 bg-white" /></CardContent></Card></div>
 }

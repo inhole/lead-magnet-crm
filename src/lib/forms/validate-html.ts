@@ -121,7 +121,7 @@ function optionValues(element: Element): FormOption[] {
 export function validateFormHtml(html: string): HtmlValidationResult {
   const errors: HtmlValidationError[] = []
   if (!html.trim()) return { ok: false, errors: [{ code: "EMPTY_HTML", message: "HTML 내용이 비어 있습니다." }] }
-  if (new TextEncoder().encode(html).length > MAX_HTML_BYTES) {
+  if (Buffer.byteLength(html, "utf8") > MAX_HTML_BYTES) {
     return { ok: false, errors: [{ code: "HTML_TOO_LARGE", message: "HTML 파일은 256KB 이하여야 합니다." }] }
   }
 

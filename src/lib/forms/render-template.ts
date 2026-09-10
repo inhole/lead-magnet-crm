@@ -74,11 +74,3 @@ export function buildInteractiveTemplate(html: string, copy: FormCopy, bridgeTok
   const securityHead = `<meta http-equiv="Content-Security-Policy" content="${csp}"><meta charset="utf-8">`
   return injectHead(customized, securityHead).replace("</body>", `<script>${bridgeScript}</script></body>`)
 }
-
-export function buildEditorTemplate(html: string, copy: FormCopy, bridgeToken: string) {
-  const customized = customizeFormHtml(html, copy)
-  const csp = "default-src 'none'; style-src 'unsafe-inline'; img-src data:; script-src 'unsafe-inline'; form-action 'none'; base-uri 'none'"
-  const bridgeScript = `(()=>{const token=${JSON.stringify(bridgeToken)};const markers=[["data-form-title","title"],["data-form-description","description"],["data-form-submit","submitLabel"]];const sendHeight=()=>{const height=Math.ceil(Math.max(document.body?.scrollHeight||0,document.documentElement.scrollHeight));parent.postMessage({channel:"lead-magnet-editor",token,type:"resize",height},"*")};document.addEventListener("submit",event=>event.preventDefault(),true);for(const[attr,field]of markers){const element=document.querySelector("["+attr+"]");if(!element)continue;let editable=element;if(element.tagName==="BUTTON"){const span=document.createElement("span");span.textContent=element.textContent;element.textContent="";element.appendChild(span);editable=span}editable.contentEditable="true";editable.addEventListener("keydown",event=>{if(event.key==="Enter")event.preventDefault()});editable.addEventListener("input",()=>{parent.postMessage({channel:"lead-magnet-editor",token,type:"copy",field,value:editable.textContent||""},"*")})}new ResizeObserver(sendHeight).observe(document.documentElement);addEventListener("load",sendHeight);sendHeight()})();`
-  const securityHead = `<meta http-equiv="Content-Security-Policy" content="${csp}"><meta charset="utf-8"><style>body{margin:0;padding:24px;font-family:system-ui,sans-serif}form{max-width:560px;margin:auto}[contenteditable="true"]{display:inline-block;min-width:2em;min-height:1.2em;outline:1px dashed transparent;border-radius:4px}[contenteditable="true"]:hover,[contenteditable="true"]:focus{outline-color:#94a3b8}</style>`
-  return injectHead(customized, securityHead).replace("</body>", `<script>${bridgeScript}</script></body>`)
-}
