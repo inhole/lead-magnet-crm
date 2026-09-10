@@ -67,7 +67,17 @@
 - 기준 커밋: `<최종 main SHA>`
 - 접근 방법: 운영자 계정 정보는 `<비공개 전달 채널>`로 별도 전달드렸습니다.
 
-로컬 실행과 테스트 방법은 README, 배포 및 새 DB 재현 절차는 `docs/deployment-runbook.md`, 주요 의사결정은 `docs/adr/README.md` 색인, 지원·미지원 범위와 검증 근거는 `docs/submission-checklist.md`에서 확인할 수 있습니다.
+아래 항목은 모두 저장소에서 확인하실 수 있습니다.
+
+- 실행 가능한 소스 코드 저장소: 저장소 루트, README 안내에 따라 로컬에서 바로 실행할 수 있습니다.
+- 데이터베이스 스키마와 마이그레이션: `supabase/migrations/`
+- 환경 변수 예시: `.env.example`
+- 테스트 코드: `tests/` (단위·통합·E2E), 설정은 `vitest.config.mts` / `vitest.integration.config.mts`
+- API 문서: https://lead-magnet-crm.vercel.app/api-docs (OpenAPI 원본 https://lead-magnet-crm.vercel.app/api/openapi)
+- README: 실행·테스트 방법
+- ADR: `docs/adr/README.md` 색인, 주요 설계 결정과 근거
+
+배포 및 새 DB 재현 절차는 `docs/deployment-runbook.md`, 지원·미지원 범위와 검증 근거는 `docs/submission-checklist.md`에서 확인할 수 있습니다.
 
 감사합니다.
 
