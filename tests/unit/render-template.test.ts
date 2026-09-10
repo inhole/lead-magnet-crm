@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { buildInteractiveTemplate, buildTemplatePreview, customizeFormHtml, extractFormCopy } from "@/lib/forms/render-template"
+import { buildEditorTemplate, buildInteractiveTemplate, buildTemplatePreview, customizeFormHtml, extractFormCopy } from "@/lib/forms/render-template"
 
 const html = `<main><h1 data-form-title>기존 제목</h1><p data-form-description>기존 설명</p><form><label for="email">이메일</label><input id="email" name="email" type="email"><button type="submit" data-form-submit>기존 버튼</button></form></main>`
 const copy = { title: "새 <제목>", description: "새 안내", submitLabel: "자료 받기" }
@@ -36,5 +36,22 @@ describe("HTML 템플릿 렌더링", () => {
     expect(result).toContain('const token="bridge-token"')
     expect(result).toContain('type:"resize"')
     expect(result).toContain("ResizeObserver")
+  })
+
+  it("에디터 미리보기는 문구 마커에만 contenteditable을 부여하고 토큰이 담긴 브리지를 주입한다", () => {
+    const result = buildEditorTemplate(html, copy, "editor-token")
+    expect(result).toContain("script-src 'unsafe-inline'")
+    expect(result).toContain('channel:"lead-magnet-editor"')
+    expect(result).toContain('const token="editor-token"')
+    expect(result).toContain('type:"copy"')
+    expect(result).toContain('contentEditable="true"')
+    expect(result).toContain("data-form-title")
+    expect(result).toContain("data-form-description")
+    expect(result).toContain("data-form-submit")
+  })
+
+  it("에디터 미리보기는 제출 버튼 클릭이 실제 폼 제출로 이어지지 않도록 막는다", () => {
+    const result = buildEditorTemplate(html, copy, "editor-token")
+    expect(result).toContain('addEventListener("submit",event=>event.preventDefault(),true)')
   })
 })
