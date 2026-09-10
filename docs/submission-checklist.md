@@ -50,6 +50,7 @@ P10 변경이 병합되면 병합 SHA의 CI와 Production 배포를 다시 확�
 
 - 지원: HTML 허용 목록 검증, 텍스트·이메일·전화·숫자·선택·체크박스·라디오 입력, 4개 채널 링크, 방문·신청·CRM·성과, OpenAPI 문서.
 - 미지원: 파일 첨부, 외부 폰트·이미지·스타일시트, 업로드 HTML의 JavaScript, 셀프 회원가입·비밀번호 재설정.
+- 커스터마이즈 범위: 등록한 HTML의 제목, 안내 문구, 제출 버튼 문구 세 가지다. 관리자 화면에서 입력 항목을 추가·삭제하는 폼 구조 편집은 제공하지 않으며 근거는 ADR-008에 있다. 입력 항목을 바꾸려면 새 HTML을 등록한다.
 - 남은 확인: 위 수동 체크리스트의 연결된 Production 전체 성공 흐름. 자동 CI의 DB/E2E는 격리된 로컬 Supabase에서 통과했으며 운영 DB 검증을 대신하지 않는다.
 
 ## 제출 메일 초안
@@ -66,7 +67,7 @@ P10 변경이 병합되면 병합 SHA의 CI와 Production 배포를 다시 확�
 - 기준 커밋: `<최종 main SHA>`
 - 접근 방법: 운영자 계정 정보는 `<비공개 전달 채널>`로 별도 전달드렸습니다.
 
-로컬 실행과 테스트 방법은 README, 배포 및 새 DB 재현 절차는 `docs/deployment-runbook.md`, 지원·미지원 범위와 검증 근거는 `docs/submission-checklist.md`에서 확인할 수 있습니다.
+로컬 실행과 테스트 방법은 README, 배포 및 새 DB 재현 절차는 `docs/deployment-runbook.md`, 주요 의사결정은 `docs/adr/README.md` 색인, 지원·미지원 범위와 검증 근거는 `docs/submission-checklist.md`에서 확인할 수 있습니다.
 
 감사합니다.
 

@@ -21,7 +21,7 @@ npx supabase status
 - `SUPABASE_SERVICE_ROLE_KEY`: service_role key
 - `APP_URL`: `http://localhost:3000`
 
-로컬 Supabase Studio(`http://127.0.0.1:54323`)의 Authentication / Users에서 이메일·비밀번호 운영자를 하나 생성합니다. `npx supabase start`는 `supabase/migrations`의 마이그레이션을 새 로컬 DB에 순서대로 적용합니다.
+로컬 Supabase Studio(`http://127.0.0.1:54323`)의 Authentication / Users에서 이메일·비밀번호 운영자를 하나 생성합니다. 회원가입 화면과 API는 제공하지 않습니다. `npx supabase start`는 `supabase/migrations`의 마이그레이션을 새 로컬 DB에 순서대로 적용합니다.
 
 ```bash
 npm run dev
@@ -35,23 +35,6 @@ npm run dev
 
 ```bash
 npx supabase stop --no-backup
-```
-
-## 연결된 Supabase 사용
-
-Supabase 프로젝트 설정의 Project URL, Publishable key, Service role key를 같은 환경변수 이름으로 등록합니다. Service role key는 서버 전용이며 브라우저 환경변수나 클라이언트 코드에 넣지 않습니다. 마이그레이션 적용은 연결된 프로젝트를 확인한 뒤 수행합니다.
-
-```bash
-npx supabase link --project-ref <project-ref>
-npx supabase db push
-```
-
-운영자는 Supabase Dashboard의 Authentication / Users에서 사전 생성합니다. 회원가입 화면과 API는 제공하지 않습니다.
-
-`202609090005_template_copy_defaults.sql` 적용 후에는 기존 템플릿의 등록 HTML을 다시 파싱해 문구 컬럼을 채우는 백필을 한 번 실행합니다. `NEXT_PUBLIC_SUPABASE_URL`과 `SUPABASE_SERVICE_ROLE_KEY`가 현재 셸에 설정된 상태에서 실행합니다.
-
-```bash
-npm run backfill:template-copy
 ```
 
 ## 검사
@@ -76,8 +59,14 @@ npm run test:e2e
 
 CI는 `npm ci` 후 lint·typecheck·build, 단위 테스트, 새 로컬 Supabase 통합 테스트, 데스크톱·모바일 Chromium E2E를 각각 실행합니다.
 
-배포 후에는 데이터를 변경하지 않는 공개 경로 스모크 검사를 실행합니다. 원격 migration 적용과 운영자 A/B 전체 흐름은 [배포 및 새 DB 재현 런북](docs/deployment-runbook.md)을 따릅니다.
+배포한 주소에는 데이터를 변경하지 않는 공개 경로 스모크 검사를 실행합니다.
 
 ```bash
 npm run test:deployment:smoke -- https://<production-domain>
 ```
+
+## 그 밖의 문서
+
+- 연결된 Supabase 프로젝트 등록, 원격 마이그레이션, 배포 절차: [배포 및 새 DB 재현 런북](docs/deployment-runbook.md)
+- 주요 의사결정: [의사결정 기록 색인](docs/adr/README.md)
+- API 계약: [OpenAPI 명세](docs/api/openapi.yaml)
