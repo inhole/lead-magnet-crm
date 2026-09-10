@@ -1,8 +1,10 @@
 # ADR-005: 가변 폼 입력값의 JSONB 저장
 
-## 상태
-
-채택
+- 상태: 채택
+- 날짜: 2026-09-09
+- 도입: 이슈 #14, PR #15
+- 구현: `supabase/migrations/202609080001_initial_schema.sql`, `src/lib/submissions/validation.ts`, `src/lib/submissions/display.ts`
+- 관련 ADR: [ADR-003](003-html-contract-and-sandbox.md)
 
 ## 결정
 
@@ -16,4 +18,5 @@
 
 - 입력 스키마가 달라지는 기존 템플릿 덮어쓰기는 지원하지 않는다.
 - JSONB 필드별 고급 검색·인덱스·CSV 내보내기는 현재 범위에서 제외한다.
-- 운영자 응답은 DB 함수의 `form_values`를 HTTP 계약의 `values`로 변환한다.
+- 운영자 응답은 데이터베이스 함수의 `form_values`를 HTTP 계약의 `values`로 변환한다.
+- 선택지는 `{ value, label }` 형태로 저장해 신청 상세에서 사람이 읽는 라벨을 보여준다.
