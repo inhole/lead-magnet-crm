@@ -130,3 +130,11 @@
 - 변경: `html_templates`에 `default_title`/`default_description`/`default_submit_label` 컬럼을 추가하고 등록 시 `extractFormCopy`로 채움. 목록·상세·검증 API 응답에 문구를 포함해 캠페인 생성 화면이 목록 응답만으로 즉시 채울 수 있게 함. `applyTemplateDefaults`로 사용자가 직접 고친 필드는 템플릿을 바꿔도 유지되도록 함. 등록 화면과 템플릿 상세에 문구를 표시함
 - 백필: 기존 템플릿의 Storage HTML을 다시 파싱해 문구 컬럼을 채우는 `scripts/backfill-template-copy-defaults.mjs`(`npm run backfill:template-copy`)를 추가하고, 레거시 형태 템플릿에 대해 로컬 Supabase에서 직접 실행해 컬럼이 정확히 채워짐을 확인함
 - 검증: lint, typecheck, 단위 테스트 52건, 새 로컬 DB 초기화 후 통합 테스트 8건, 데스크톱·모바일 E2E 14건(템플릿 선택 시 즉시 채움과 문구 수정 후 다른 템플릿 선택 시 유지 확인 포함), 프로덕션 build 통과
+
+## 개선 D 롤백 — 관리자 HTML 구조 에디터 되돌리기
+
+- 상태: 완료
+- 이슈: #36
+- 사유: #35(개선 D, 구조 편집기·HTML 직접 작성 탭)가 실제 사용 흐름과 맞지 않아 되돌림. 운영자가 기대한 것은 기존 파일 업로드 미리보기에서 문구를 바로 고치는 것이었는데, 필드를 처음부터 새로 만드는 별도 폼 빌더와 HTML 텍스트 직접 입력 탭이 추가되어 등록 화면이 오히려 복잡해졌다
+- 변경: `git revert`로 PR #35(커밋 e6f4771) 전체를 되돌림. `/templates/new`는 다시 파일 업로드 단일 화면으로 동작함. ADR-008 제거
+- 후속: 파일 업로드 미리보기 안에서 제목·안내 문구·제출 버튼 문구를 직접 편집하는 기능은 별도 이슈에서 진행
